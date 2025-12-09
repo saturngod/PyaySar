@@ -11,14 +11,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useForm } from '@inertiajs/react';
+import { Textarea } from '@/components/ui/textarea';
 import { Plus } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Customer {
     id: number;
     name: string;
     email: string;
     address: string;
+    avatar?: string;
 }
 
 interface CustomerFormDialogProps {
@@ -33,11 +35,15 @@ export function CustomerFormDialog({
     onOpenChange,
 }: CustomerFormDialogProps) {
     const isEditing = !!customer;
-    const { data, setData, post, put, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors, reset } = useForm({
         name: customer?.name || '',
         email: customer?.email || '',
         address: customer?.address || '',
+        avatar: null as File | null,
+        _method: isEditing ? 'put' : 'post',
     });
+
+    const [preview, setPreview] = useState<string | null>(null);
 
     useEffect(() => {
         if (customer) {
@@ -45,28 +51,36 @@ export function CustomerFormDialog({
                 name: customer.name,
                 email: customer.email,
                 address: customer.address,
+                avatar: null,
+                _method: 'put',
             });
+            setPreview(customer.avatar ? `/storage/${customer.avatar}` : null);
         } else {
             reset();
+            setData('_method', 'post');
+            setPreview(null);
         }
-    }, [customer, open, reset, setData]);
+    }, [customer, open]); // Removed reset/setData from deps to avoid loops, simplified deps
 
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (isEditing) {
-            put(`/customers/${customer.id}`, {
-                onSuccess: () => {
-                    reset();
-                    onOpenChange(false);
-                },
-            });
-        } else {
-            post('/customers', {
-                onSuccess: () => {
-                    reset();
-                    onOpenChange(false);
-                },
-            });
+
+        const url = isEditing ? `/customers/${customer.id}` : '/customers';
+
+        post(url, {
+            onSuccess: () => {
+                reset();
+                setPreview(null);
+                onOpenChange(false);
+            },
+        });
+    };
+
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setData('avatar', file);
+            setPreview(URL.createObjectURL(file));
         }
     };
 
@@ -91,6 +105,34 @@ export function CustomerFormDialog({
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={onSubmit} className="grid gap-4 py-4">
+
+                    {/* Avatar Upload */}
+                    <div className="flex flex-col items-center gap-4">
+                        {preview ? (
+                            <img
+                                src={preview}
+                                alt="Avatar Preview"
+                                className="h-24 w-24 rounded-full object-cover border border-gray-200"
+                            />
+                        ) : (
+                            <div className="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                                No Image
+                            </div>
+                        )}
+                        <Input
+                            id="avatar"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleAvatarChange}
+                            className="w-full max-w-xs"
+                        />
+                        {errors.avatar && (
+                            <span className="text-sm text-red-500">
+                                {errors.avatar}
+                            </span>
+                        )}
+                    </div>
+
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="name" className="text-right">
                             Name
@@ -118,7 +160,7 @@ export function CustomerFormDialog({
                             onChange={(e) => setData('email', e.target.value)}
                             className="col-span-3"
                         />
-                         {errors.email && (
+                        {errors.email && (
                             <span className="col-span-4 text-right text-sm text-red-500">
                                 {errors.email}
                             </span>
@@ -128,13 +170,13 @@ export function CustomerFormDialog({
                         <Label htmlFor="address" className="text-right">
                             Address
                         </Label>
-                        <Input
+                        <Textarea
                             id="address"
                             value={data.address}
                             onChange={(e) => setData('address', e.target.value)}
-                            className="col-span-3"
+                            className="col-span-3 min-h-[100px]"
                         />
-                         {errors.address && (
+                        {errors.address && (
                             <span className="col-span-4 text-right text-sm text-red-500">
                                 {errors.address}
                             </span>

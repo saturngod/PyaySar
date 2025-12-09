@@ -38,7 +38,7 @@ class InvoiceController extends Controller
             ->orderBy('created_at', 'desc')
             ->get(); // Using get() for now, pagination can be added later if needed
 
-        $customers = Auth::user()->customers()->select('id', 'name')->get();
+        $customers = Auth::user()->customers()->select('id', 'name', 'avatar')->get();
 
         return Inertia::render('invoices/index', [
             'invoices' => $invoices,
@@ -49,7 +49,7 @@ class InvoiceController extends Controller
 
     public function create()
     {
-        $customers = Auth::user()->customers()->select('id', 'name', 'email', 'address')->get();
+        $customers = Auth::user()->customers()->select('id', 'name', 'email', 'address', 'avatar')->get();
         // Simple logic for next invoice number (could be improved)
         $nextInvoiceId = (Invoice::max('id') ?? 0) + 1;
 
@@ -110,7 +110,7 @@ class InvoiceController extends Controller
         }
 
         $invoice->load(['items', 'customer']);
-        $customers = Auth::user()->customers()->select('id', 'name', 'email', 'address')->get();
+        $customers = Auth::user()->customers()->select('id', 'name', 'email', 'address', 'avatar')->get();
 
         return Inertia::render('invoices/edit', [
             'invoice' => $invoice,
@@ -126,7 +126,7 @@ class InvoiceController extends Controller
         }
 
         $invoice->load(['items', 'customer']);
-        $customers = Auth::user()->customers()->select('id', 'name', 'email', 'address')->get();
+        $customers = Auth::user()->customers()->select('id', 'name', 'email', 'address', 'avatar')->get();
 
         return Inertia::render('invoices/show', [
             'invoice' => $invoice,
@@ -188,7 +188,7 @@ class InvoiceController extends Controller
             }
         });
 
-        return redirect()->route('invoices.index')->with('success', 'Invoice updated successfully.');
+        return redirect()->route('invoices.show', $invoice)->with('success', 'Invoice updated successfully.');
     }
 
     public function destroy(Invoice $invoice)

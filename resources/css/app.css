@@ -188,7 +188,14 @@
     .border-dashed {
         border-style: dashed !important;
         border-color: #e5e7eb !important; /* gray-200 */
-        border-width: 0 0 1px 0 !important;
+    }
+
+    .border-b.border-dashed {
+        border-bottom-width: 1px !important;
+    }
+
+    .border-t.border-dashed {
+        border-top-width: 1px !important;
     }
 
     /* Prevent page breaks inside important elements */

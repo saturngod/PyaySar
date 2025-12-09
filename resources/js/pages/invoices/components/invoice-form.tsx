@@ -26,7 +26,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { CalendarIcon, Check, Plus, Trash2 } from 'lucide-react';
+import { CalendarIcon, Check, Plus, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
 
 export interface Customer {
@@ -34,6 +34,7 @@ export interface Customer {
     name: string;
     email: string;
     address: string;
+    avatar?: string;
 }
 
 export interface InvoiceItem {
@@ -81,21 +82,21 @@ export default function InvoiceForm({
     className,
 }: InvoiceFormProps) {
     const isEditing = !!invoice;
-    
+
     // Initial Items State
     const initialItems = invoice?.items?.map((item: InvoiceItem) => ({
         ...item,
         qty: Number(item.qty),
         price: Number(item.price),
     })) || [
-        {
-            item_name: '',
-            description: '',
-            qty: 1,
-            price: 0,
-            total_price: 0,
-        },
-    ];
+            {
+                item_name: '',
+                description: '',
+                qty: 1,
+                price: 0,
+                total_price: 0,
+            },
+        ];
 
     const { data, setData, post, put, processing, errors } = useForm({
         customer_id: invoice?.customer_id?.toString() || '',
@@ -109,7 +110,7 @@ export default function InvoiceForm({
     });
 
     const [customerOpen, setCustomerOpen] = useState(false);
-    
+
     // Derived state for selected customer
     const selectedCustomer = customers.find(c => c.id.toString() === data.customer_id);
 
@@ -135,23 +136,23 @@ export default function InvoiceForm({
     const updateItem = (index: number, field: keyof InvoiceItem, value: string | number) => {
         const newItems = [...data.items];
         newItems[index] = { ...newItems[index], [field]: value };
-        
+
         // Auto-calculate total
         if (field === 'qty' || field === 'price') {
-             const qty = field === 'qty' ? Number(value) : Number(newItems[index].qty);
-             const price = field === 'price' ? Number(value) : Number(newItems[index].price);
-             newItems[index].total_price = qty * price;
+            const qty = field === 'qty' ? Number(value) : Number(newItems[index].qty);
+            const price = field === 'price' ? Number(value) : Number(newItems[index].price);
+            newItems[index].total_price = qty * price;
         }
 
         setData('items', newItems);
     };
 
     const subTotal = data.items.reduce((acc, item) => acc + (item.qty * item.price), 0);
-    const total = subTotal; 
+    const total = subTotal;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         // Format dates for backend
         const formattedData: Record<string, unknown> = {
             ...data,
@@ -166,8 +167,8 @@ export default function InvoiceForm({
         }
     };
 
-    const containerClass = className && className.includes('max-w-') 
-        ? className 
+    const containerClass = className && className.includes('max-w-')
+        ? className
         : cn("max-w-4xl", className);
 
     return (
@@ -184,10 +185,10 @@ export default function InvoiceForm({
                 </div>
                 <div className="col-span-2"> {/* This div now spans two columns */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
+                        <div className={cn("space-y-1", !data.due_date && readonly && "print:col-start-2 print:text-right")}>
                             <Label className="text-xs text-gray-500">Issued</Label>
                             {readonly ? (
-                                <div className="flex h-8 w-full items-center px-2 -ml-2 text-sm text-gray-900">
+                                <div className={cn("flex h-8 w-full items-center px-2 -ml-2 text-sm text-gray-900", !data.due_date && readonly && "print:justify-end print:px-0 print:ml-0")}>
                                     <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
                                     {data.open_date ? format(data.open_date, "PPP") : '-'}
                                 </div>
@@ -217,40 +218,56 @@ export default function InvoiceForm({
                             )}
                             {errors.open_date && <p className="text-sm text-red-500">{errors.open_date}</p>}
                         </div>
-                        <div className="space-y-1">
-                            <Label className="text-xs text-gray-500">Due</Label>
-                            {readonly ? (
-                                <div className="flex h-8 w-full items-center px-2 -ml-2 text-sm text-gray-900">
-                                    <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
-                                    {data.due_date ? format(data.due_date, "PPP") : '-'}
-                                </div>
-                            ) : (
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            className={cn(
-                                                "w-full justify-start text-left font-normal border-none shadow-none h-8 px-2 -ml-2 hover:bg-gray-50",
-                                                !data.due_date && "text-muted-foreground"
-                                            )}
-                                        >
-                                            <CalendarIcon className="mr-2 h-4 w-4" />
-                                            {data.due_date ? format(data.due_date, "PPP") : <span>Pick a date</span>}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0">
-                                        <Calendar
-                                            mode="single"
-                                            selected={data.due_date}
-                                            onSelect={(date) => setData('due_date', date)}
-                                            initialFocus
-                                        />
-                                    </PopoverContent>
-                                </Popover>
-                            )}
-                            {errors.due_date && <p className="text-sm text-red-500">{errors.due_date}</p>}
-                        </div>
-                        <div className="space-y-1">
+                        {(data.due_date || !readonly) && (
+                            <div className="space-y-1">
+                                <Label className="text-xs text-gray-500">Due</Label>
+                                {readonly ? (
+                                    <div className="flex h-8 w-full items-center px-2 -ml-2 text-sm text-gray-900">
+                                        <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
+                                        {data.due_date ? format(data.due_date, "PPP") : '-'}
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center">
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    className={cn(
+                                                        "w-full justify-start text-left font-normal border-none shadow-none h-8 px-2 -ml-2 hover:bg-gray-50",
+                                                        !data.due_date && "text-muted-foreground"
+                                                    )}
+                                                >
+                                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                                    {data.due_date ? format(data.due_date, "PPP") : <span>Pick a date</span>}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={data.due_date}
+                                                    onSelect={(date) => setData('due_date', date)}
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                        {data.due_date && (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 shrink-0 text-gray-400 hover:text-red-500"
+                                                onClick={() => setData('due_date', undefined)}
+                                                title="Clear due date"
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        )}
+                                    </div>
+                                )}
+                                {errors.due_date && <p className="text-sm text-red-500">{errors.due_date}</p>}
+                            </div>
+                        )}
+                        <div className="space-y-1 no-print">
                             <Label className="text-xs text-gray-500">Currency</Label>
                             {readonly ? (
                                 <div className="flex h-8 w-full items-center px-2 -ml-2 text-sm text-gray-900">
@@ -272,7 +289,7 @@ export default function InvoiceForm({
                                 </Select>
                             )}
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1 no-print">
                             <Label className="text-xs text-gray-500">Status</Label>
                             {readonly ? (
                                 <div className="flex h-8 w-full items-center px-2 -ml-2 text-sm text-gray-900">
@@ -306,19 +323,19 @@ export default function InvoiceForm({
                     <label className="mb-6 block text-xs font-semibold uppercase text-gray-400">
                         From
                     </label>
-                     {/* Placeholder Avatar or Logo */}
+                    {/* Placeholder Avatar or Logo */}
                     {!readonly && !userPreference?.company_logo && <div className="mb-4 h-12 w-12 rounded-full bg-gray-100" />}
-                    
+
                     {userPreference?.company_logo && (
                         <div className="mb-4">
-                            <img 
-                                src={`/storage/${userPreference.company_logo}`} 
-                                alt="Company Logo" 
+                            <img
+                                src={`/storage/${userPreference.company_logo}`}
+                                alt="Company Logo"
                                 className="h-16 w-16 object-cover rounded-full border border-gray-100"
                             />
                         </div>
                     )}
-                    
+
                     <div className="space-y-1">
                         <div className="text-xl font-bold text-gray-900">
                             {userPreference?.company_name}
@@ -337,10 +354,10 @@ export default function InvoiceForm({
                     <label className="mb-6 block text-xs font-semibold uppercase text-gray-400">
                         To
                     </label>
-                    
+
                     {/* Customer Selector disguised as part of the design or explicit selector */}
-                     {!readonly && (
-                         <Popover open={!readonly && customerOpen} onOpenChange={setCustomerOpen}>
+                    {!readonly && (
+                        <Popover open={!readonly && customerOpen} onOpenChange={setCustomerOpen}>
                             <PopoverTrigger asChild disabled={readonly}>
                                 <Button
                                     variant="ghost"
@@ -351,9 +368,17 @@ export default function InvoiceForm({
                                         !selectedCustomer && "border border-dashed border-gray-300",
                                         readonly && "cursor-default hover:bg-gray-100"
                                     )}
-                                >   
+                                >
                                     {selectedCustomer ? (
-                                        <div className="h-full w-full rounded-full bg-gray-200" /> 
+                                        selectedCustomer.avatar ? (
+                                            <img
+                                                src={`/storage/${selectedCustomer.avatar}`}
+                                                alt="Customer Avatar"
+                                                className="h-full w-full rounded-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="h-full w-full rounded-full bg-gray-200" />
+                                        )
                                     ) : (
                                         <Plus className="h-5 w-5 text-gray-400" />
                                     )}
@@ -388,9 +413,23 @@ export default function InvoiceForm({
                                 </Command>
                             </PopoverContent>
                         </Popover>
-                     )}
+                    )}
                     {errors.customer_id && <p className="text-sm text-red-500 mb-2">{errors.customer_id}</p>}
 
+                    {/* Readonly Avatar Display */}
+                    {readonly && selectedCustomer && (
+                        <div className="mb-4">
+                            {selectedCustomer.avatar ? (
+                                <img
+                                    src={`/storage/${selectedCustomer.avatar}`}
+                                    alt="Customer Avatar"
+                                    className="h-16 w-16 object-cover rounded-full border border-gray-100"
+                                />
+                            ) : (
+                                <div className="h-12 w-12 rounded-full bg-gray-100" />
+                            )}
+                        </div>
+                    )}
 
                     {selectedCustomer ? (
                         <div className="space-y-1">
@@ -401,7 +440,7 @@ export default function InvoiceForm({
                             </div>
                         </div>
                     ) : (
-                         <div className="text-gray-400 italic">Select a customer...</div>
+                        <div className="text-gray-400 italic">Select a customer...</div>
                     )}
                 </div>
             </div>
@@ -426,13 +465,13 @@ export default function InvoiceForm({
                                 </>
                             ) : (
                                 <>
-                                    <Input 
+                                    <Input
                                         value={item.item_name}
                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateItem(index, 'item_name', e.target.value)}
                                         className="border-none p-0 text-base font-medium shadow-none focus-visible:ring-0"
                                         placeholder="Item Name"
                                     />
-                                    <Textarea 
+                                    <Textarea
                                         value={item.description || ''}
                                         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateItem(index, 'description', e.target.value)}
                                         className="min-h-[20px] resize-none border-none p-0 text-sm text-gray-500 shadow-none focus-visible:ring-0"
@@ -443,23 +482,23 @@ export default function InvoiceForm({
                             )}
                         </div>
                         <div className="col-span-2 text-right">
-                             {readonly ? (
+                            {readonly ? (
                                 <div className="flex h-9 items-center justify-end">{item.qty}</div>
-                             ) : (
-                                <Input 
+                            ) : (
+                                <Input
                                     type="number"
                                     min="1"
                                     value={item.qty}
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateItem(index, 'qty', e.target.value)}
                                     className="border-none p-0 text-right shadow-none focus-visible:ring-0"
                                 />
-                             )}
+                            )}
                         </div>
-                         <div className="col-span-2 text-right">
-                             {readonly ? (
+                        <div className="col-span-2 text-right">
+                            {readonly ? (
                                 <div className="flex h-9 items-center justify-end">{Number(item.price).toFixed(2)}</div>
-                             ) : (
-                                <Input 
+                            ) : (
+                                <Input
                                     type="number"
                                     min="0"
                                     step="0.01"
@@ -467,12 +506,12 @@ export default function InvoiceForm({
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateItem(index, 'price', e.target.value)}
                                     className="border-none p-0 text-right shadow-none focus-visible:ring-0"
                                 />
-                             )}
+                            )}
                         </div>
                         <div className="col-span-2 flex h-9 items-center justify-end gap-2 text-right font-medium">
                             {(item.qty * item.price).toFixed(2)}
-                             {!readonly && (
-                                 <Button
+                            {!readonly && (
+                                <Button
                                     type="button"
                                     variant="ghost"
                                     size="icon"
@@ -481,7 +520,7 @@ export default function InvoiceForm({
                                 >
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
-                             )}
+                            )}
                         </div>
                     </div>
                 ))}
@@ -489,7 +528,7 @@ export default function InvoiceForm({
                 {!readonly && (
                     <Button
                         type="button"
-                        variant="ghost" 
+                        variant="ghost"
                         onClick={addItem}
                         className="mt-2 h-auto p-0 font-medium text-blue-600 hover:bg-transparent hover:text-blue-700"
                     >
@@ -502,7 +541,7 @@ export default function InvoiceForm({
             {/* Footer / Totals */}
             <div className="flex justify-between items-start">
                 <div className="w-1/2 space-y-8">
-                     {(data.notes || !readonly) && (
+                    {(data.notes || !readonly) && (
                         <div>
                             <label className="mb-2 block text-xs font-semibold uppercase text-gray-400">
                                 Note
@@ -512,7 +551,7 @@ export default function InvoiceForm({
                                     {data.notes}
                                 </div>
                             ) : (
-                                <Textarea 
+                                <Textarea
                                     value={data.notes}
                                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('notes', e.target.value)}
                                     className="bg-transparent border border-gray-200 rounded-md p-3 text-gray-500 focus-visible:ring-0"
@@ -520,9 +559,9 @@ export default function InvoiceForm({
                                 />
                             )}
                         </div>
-                     )}
-                    
-                     {(data.bank_account_info || !readonly) && (
+                    )}
+
+                    {(data.bank_account_info || !readonly) && (
                         <div>
                             <label className="mb-2 block text-xs font-semibold uppercase text-gray-400">
                                 Bank Details
@@ -532,7 +571,7 @@ export default function InvoiceForm({
                                     {data.bank_account_info}
                                 </div>
                             ) : (
-                                 <Textarea 
+                                <Textarea
                                     value={data.bank_account_info}
                                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('bank_account_info', e.target.value)}
                                     className="bg-transparent border border-gray-200 rounded-md p-3 text-gray-500 focus-visible:ring-0 h-24"
@@ -540,21 +579,21 @@ export default function InvoiceForm({
                                 />
                             )}
                         </div>
-                     )}
+                    )}
                 </div>
 
                 <div className="w-1/3 space-y-4">
-                     <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-sm">
                         <span className="font-medium text-gray-500">Subtotal</span>
                         <span className="font-medium text-gray-900">
                             {data.currency} {subTotal.toFixed(2)}
                         </span>
                     </div>
-                     <div className="border-t border-dashed border-gray-200 pt-4 flex justify-between items-center">
+                    <div className="border-t border-dashed border-gray-200 pt-4 flex justify-between items-center">
                         <span className="font-semibold text-gray-900">Total Amount</span>
-                         <span className="font-bold text-gray-900">
+                        <span className="font-bold text-gray-900">
                             {data.currency} {total.toFixed(2)}
-                         </span>
+                        </span>
                     </div>
 
                     {!readonly && (

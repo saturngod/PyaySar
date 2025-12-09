@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
+use Illuminate\Support\Facades\Storage;
+
 class CustomerController extends Controller
 {
     public function index()
@@ -31,7 +33,12 @@ class CustomerController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string|max:1000',
+            'avatar' => 'nullable|image|max:1024',
         ]);
+
+        if ($request->hasFile('avatar')) {
+            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
 
         Auth::user()->customers()->create($validated);
 
@@ -71,7 +78,15 @@ class CustomerController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string|max:1000',
+            'avatar' => 'nullable|image|max:1024',
         ]);
+
+        if ($request->hasFile('avatar')) {
+            if ($customer->avatar) {
+                Storage::disk('public')->delete($customer->avatar);
+            }
+            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
 
         $customer->update($validated);
 
@@ -83,6 +98,10 @@ class CustomerController extends Controller
     {
         if ($customer->user_id !== Auth::id()) {
             abort(403);
+        }
+
+        if ($customer->avatar) {
+            Storage::disk('public')->delete($customer->avatar);
         }
 
         $customer->delete();

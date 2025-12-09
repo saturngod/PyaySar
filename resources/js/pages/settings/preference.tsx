@@ -75,7 +75,6 @@ export default function Preference({ preference }: { preference: UserPreference 
                                 className="mt-1 block w-full"
                                 value={data.company_email}
                                 onChange={(e) => setData('company_email', e.target.value)}
-                                required
                                 autoComplete="email"
                                 placeholder="billing@company.com"
                             />
@@ -89,7 +88,6 @@ export default function Preference({ preference }: { preference: UserPreference 
                                 className="mt-1 block w-full"
                                 value={data.company_address}
                                 onChange={(e) => setData('company_address', e.target.value)}
-                                required
                                 placeholder="123 Business St, City, Country"
                             />
                             <InputError className="mt-2" message={errors.company_address} />
@@ -99,9 +97,9 @@ export default function Preference({ preference }: { preference: UserPreference 
                             <Label htmlFor="company_logo">Company Logo</Label>
                             {preference?.company_logo && (
                                 <div className="mb-2">
-                                    <img 
-                                        src={`/storage/${preference.company_logo}`} 
-                                        alt="Current Logo" 
+                                    <img
+                                        src={`/storage/${preference.company_logo}`}
+                                        alt="Current Logo"
                                         className="h-16 w-16 object-cover rounded-full border"
                                     />
                                 </div>
