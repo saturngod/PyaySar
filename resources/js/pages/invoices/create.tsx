@@ -4,11 +4,11 @@ import InvoiceForm, { Customer } from './components/invoice-form';
 
 interface CreateProps {
     customers: Customer[];
-    nextInvoiceId: number;
+    nextInvoiceNumber: string;
     userPreference: any;
 }
 
-export default function Create({ customers, nextInvoiceId, userPreference }: CreateProps) {
+export default function Create({ customers, nextInvoiceNumber, userPreference }: CreateProps) {
     return (
         <AppLayout breadcrumbs={[
             { title: 'Invoices', href: '/invoices' },
@@ -16,10 +16,10 @@ export default function Create({ customers, nextInvoiceId, userPreference }: Cre
         ]}>
             <Head title="Create Invoice" />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
-               <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-4">
                     <h1 className="text-2xl font-bold">Create Invoice</h1>
                 </div>
-                <InvoiceForm customers={customers} nextInvoiceId={nextInvoiceId} userPreference={userPreference} />
+                <InvoiceForm customers={customers} nextInvoiceNumber={nextInvoiceNumber} userPreference={userPreference} />
             </div>
         </AppLayout>
     );

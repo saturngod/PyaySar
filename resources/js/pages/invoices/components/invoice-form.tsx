@@ -48,6 +48,7 @@ export interface InvoiceItem {
 
 export interface Invoice {
     id: number;
+    invoice_number?: string;
     customer_id: number;
     status: string;
     currency: string;
@@ -62,7 +63,7 @@ export interface Invoice {
 interface InvoiceFormProps {
     customers: Customer[];
     invoice?: Invoice;
-    nextInvoiceId?: number;
+    nextInvoiceNumber?: string;
     readonly?: boolean;
     userPreference?: {
         company_name?: string;
@@ -70,18 +71,16 @@ interface InvoiceFormProps {
         company_address?: string;
         company_logo?: string;
     } | null;
-    className?: string; // Add className prop
-    id?: string;
+    className?: string;
 }
 
 export default function InvoiceForm({
     customers,
     invoice,
-    nextInvoiceId,
+    nextInvoiceNumber,
     readonly = false,
     userPreference,
     className,
-    id,
 }: InvoiceFormProps) {
     const isEditing = !!invoice;
 
@@ -101,6 +100,7 @@ export default function InvoiceForm({
         ];
 
     const { data, setData, post, put, processing, errors } = useForm({
+        invoice_number: invoice?.invoice_number || nextInvoiceNumber || '',
         customer_id: invoice?.customer_id?.toString() || '',
         status: invoice?.status || 'Draft',
         currency: invoice?.currency || 'MMK',
@@ -174,16 +174,29 @@ export default function InvoiceForm({
         : cn("max-w-4xl", className);
 
     return (
-        <form id={id} onSubmit={handleSubmit} className={cn("mx-auto rounded-xl bg-white p-8 shadow-sm border border-gray-200", containerClass)}>
+        <form onSubmit={handleSubmit} className={cn("mx-auto rounded-xl bg-white p-8 shadow-sm border border-gray-200", containerClass)}>
             {/* Header: Invoice No, Issued, Due */}
             <div className="mb-8 grid grid-cols-3 gap-8 border-b border-dashed border-gray-200 pb-8">
                 <div>
                     <label className="mb-2 block text-xs font-semibold uppercase text-gray-400">
                         Invoice No
                     </label>
-                    <div className="text-xl font-bold text-gray-900">
-                        INV-{isEditing ? invoice.id : (nextInvoiceId || '...')}
-                    </div>
+                    {readonly ? (
+                        <div className="text-xl font-bold text-gray-900">
+                            {data.invoice_number || (invoice ? `INV-${invoice.id}` : '...')}
+                        </div>
+                    ) : (
+                        <div>
+                            <Input
+                                value={data.invoice_number}
+                                onChange={(e) => setData('invoice_number', e.target.value)}
+                                className="text-xl font-bold text-gray-900 border-none p-0 shadow-none focus-visible:ring-0 h-auto rounded-none"
+                                placeholder="INV-..."
+                            />
+                            {/* @ts-ignore */}
+                            {errors.invoice_number && <p className="text-sm text-red-500">{errors.invoice_number}</p>}
+                        </div>
+                    )}
                 </div>
                 <div className="col-span-2"> {/* This div now spans two columns */}
                     <div className="grid grid-cols-2 gap-4">

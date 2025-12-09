@@ -51,11 +51,12 @@ class InvoiceController extends Controller
     {
         $customers = Auth::user()->customers()->select('id', 'name', 'email', 'address', 'avatar')->get();
         // Simple logic for next invoice number (could be improved)
-        $nextInvoiceId = (Invoice::max('id') ?? 0) + 1;
+        $nextId = (Invoice::max('id') ?? 0) + 1;
+        $nextInvoiceNumber = 'INV-' . $nextId;
 
         return Inertia::render('invoices/create', [
             'customers' => $customers,
-            'nextInvoiceId' => $nextInvoiceId,
+            'nextInvoiceNumber' => $nextInvoiceNumber,
             'userPreference' => Auth::user()->preference,
         ]);
     }
@@ -75,6 +76,7 @@ class InvoiceController extends Controller
 
         DB::transaction(function () use ($validated, $subTotal, $total) {
             $invoice = Auth::user()->invoices()->create([
+                'invoice_number' => $validated['invoice_number'],
                 'customer_id' => $validated['customer_id'],
                 'open_date' => $validated['open_date'],
                 'due_date' => $validated['due_date'] ?? null,
@@ -153,6 +155,7 @@ class InvoiceController extends Controller
             $newStatus = $validated['status'];
 
             $invoice->update([
+                'invoice_number' => $validated['invoice_number'],
                 'customer_id' => $validated['customer_id'],
                 'open_date' => $validated['open_date'],
                 'due_date' => $validated['due_date'] ?? null,

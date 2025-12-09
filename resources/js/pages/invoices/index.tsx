@@ -32,6 +32,7 @@ import { StatusHistoryDialog } from './components/status-history-dialog';
 
 interface Invoice {
     id: number;
+    invoice_number?: string;
     total: string;
     status: 'Draft' | 'Sent' | 'Reject' | 'Received';
     open_date: string;
@@ -80,7 +81,7 @@ export default function Index({ invoices, filters, customers }: IndexProps) {
         });
     };
 
-    const  openHistory = (invoiceId: number) => {
+    const openHistory = (invoiceId: number) => {
         setSelectedInvoiceId(invoiceId);
         setHistoryOpen(true);
     };
@@ -120,13 +121,13 @@ export default function Index({ invoices, filters, customers }: IndexProps) {
                                 </TableRow>
                             ) : (
                                 invoices.map((invoice) => (
-                                    <TableRow 
-                                        key={invoice.id} 
+                                    <TableRow
+                                        key={invoice.id}
                                         className="cursor-pointer hover:bg-muted/50"
                                         onClick={() => router.visit(`/invoices/${invoice.id}`)}
                                     >
                                         <TableCell className="font-medium">
-                                            INV-{invoice.id}
+                                            {invoice.invoice_number || `INV-${invoice.id}`}
                                         </TableCell>
                                         <TableCell>
                                             {invoice.customer?.name || 'N/A'}
@@ -177,7 +178,7 @@ export default function Index({ invoices, filters, customers }: IndexProps) {
                                                     <DropdownMenuItem asChild>
                                                         <Link href={`/invoices/${invoice.id}/edit`}>Edit</Link>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem 
+                                                    <DropdownMenuItem
                                                         className="text-red-600 focus:text-red-600 cursor-pointer"
                                                         onClick={() => {
                                                             if (confirm('Are you sure?')) {
@@ -198,10 +199,10 @@ export default function Index({ invoices, filters, customers }: IndexProps) {
                 </div>
             </div>
 
-            <StatusHistoryDialog 
-                open={historyOpen} 
-                onOpenChange={setHistoryOpen} 
-                invoiceId={selectedInvoiceId} 
+            <StatusHistoryDialog
+                open={historyOpen}
+                onOpenChange={setHistoryOpen}
+                invoiceId={selectedInvoiceId}
             />
         </AppLayout>
     );

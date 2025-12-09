@@ -189,7 +189,7 @@ const InvoicePdfDocument = ({ invoice, userPreference }: InvoicePdfProps) => {
                 <View style={styles.header}>
                     <View>
                         <Text style={styles.label}>Invoice No</Text>
-                        <Text style={styles.invoiceNo}>INV-{invoice.id}</Text>
+                        <Text style={styles.invoiceNo}>{invoice.invoice_number || `INV-${invoice.id}`}</Text>
                     </View>
                     <View style={styles.dateRow}>
                         <View style={styles.dateItem}>
