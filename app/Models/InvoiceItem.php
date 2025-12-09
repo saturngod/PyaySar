@@ -12,69 +12,20 @@ class InvoiceItem extends Model
 
     protected $fillable = [
         'invoice_id',
-        'item_id',
+        'item_name',
+        'description',
         'price',
         'qty',
+        'total_price',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
-        'qty' => 'integer',
+        'total_price' => 'decimal:2',
     ];
 
-    /**
-     * Get the invoice that owns the invoice item.
-     */
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
-    }
-
-    /**
-     * Get the item for this invoice item.
-     */
-    public function item(): BelongsTo
-    {
-        return $this->belongsTo(Item::class);
-    }
-
-    /**
-     * Get the total price for this invoice item (price * quantity).
-     */
-    public function getTotalAttribute(): float
-    {
-        return $this->price * $this->qty;
-    }
-
-    /**
-     * Get formatted total amount.
-     */
-    public function getFormattedTotalAttribute(): string
-    {
-        return number_format($this->total, 2);
-    }
-
-    /**
-     * Boot the model.
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::saved(function ($invoiceItem) {
-            // Recalculate invoice totals when invoice items change
-            if ($invoiceItem->invoice) {
-                $invoiceItem->invoice->calculateTotals();
-                $invoiceItem->invoice->saveQuietly();
-            }
-        });
-
-        static::deleted(function ($invoiceItem) {
-            // Recalculate invoice totals when invoice items are deleted
-            if ($invoiceItem->invoice) {
-                $invoiceItem->invoice->calculateTotals();
-                $invoiceItem->invoice->saveQuietly();
-            }
-        });
     }
 }
