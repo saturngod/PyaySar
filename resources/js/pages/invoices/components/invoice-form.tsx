@@ -71,6 +71,7 @@ interface InvoiceFormProps {
         company_logo?: string;
     } | null;
     className?: string; // Add className prop
+    id?: string;
 }
 
 export default function InvoiceForm({
@@ -80,6 +81,7 @@ export default function InvoiceForm({
     readonly = false,
     userPreference,
     className,
+    id,
 }: InvoiceFormProps) {
     const isEditing = !!invoice;
 
@@ -172,7 +174,7 @@ export default function InvoiceForm({
         : cn("max-w-4xl", className);
 
     return (
-        <form onSubmit={handleSubmit} className={cn("mx-auto rounded-xl bg-white p-8 shadow-sm border border-gray-200", containerClass)}>
+        <form id={id} onSubmit={handleSubmit} className={cn("mx-auto rounded-xl bg-white p-8 shadow-sm border border-gray-200", containerClass)}>
             {/* Header: Invoice No, Issued, Due */}
             <div className="mb-8 grid grid-cols-3 gap-8 border-b border-dashed border-gray-200 pb-8">
                 <div>

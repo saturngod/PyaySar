@@ -1,8 +1,9 @@
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link } from '@inertiajs/react';
-import InvoiceForm, { Customer, Invoice } from './components/invoice-form';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Pencil, Printer } from 'lucide-react';
+import { Head, Link } from '@inertiajs/react';
+import { ChevronLeft, Download, Pencil, Printer } from 'lucide-react';
+import InvoiceForm, { Customer, Invoice } from './components/invoice-form';
+import { generateInvoicePdf } from './components/invoice-pdf';
 
 interface ShowProps {
     invoice: Invoice;
@@ -11,6 +12,10 @@ interface ShowProps {
 }
 
 export default function Show({ invoice, customers, userPreference }: ShowProps) {
+    const handleDownloadPdf = () => {
+        generateInvoicePdf(invoice, userPreference);
+    };
+
     return (
         <AppLayout breadcrumbs={[{ title: 'Invoices', href: '/invoices' }, { title: `INV-${invoice.id}`, href: `/invoices/${invoice.id}` }]}>
             <Head title={`Invoice #${invoice.id}`} />
@@ -22,7 +27,10 @@ export default function Show({ invoice, customers, userPreference }: ShowProps) 
                         Back to Invoices
                     </Link>
                     <div className="flex gap-2">
-                         <Button variant="outline" onClick={() => window.print()} className="no-print">
+                        <Button variant="outline" onClick={handleDownloadPdf} className="no-print">
+                            <Download className="mr-2 h-4 w-4" /> Download PDF
+                        </Button>
+                        <Button variant="outline" onClick={() => window.print()} className="no-print">
                             <Printer className="mr-2 h-4 w-4" /> Print
                         </Button>
                         <Link href={`/invoices/${invoice.id}/edit`} className="no-print">
@@ -34,6 +42,7 @@ export default function Show({ invoice, customers, userPreference }: ShowProps) 
                 </div>
 
                 <InvoiceForm
+                    id="invoice-pdf-content"
                     customers={customers}
                     invoice={invoice}
                     readonly={true}
