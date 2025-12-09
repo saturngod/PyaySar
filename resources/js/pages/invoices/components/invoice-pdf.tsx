@@ -297,7 +297,7 @@ export const generateInvoicePdf = async (invoice: Invoice, userPreference: Invoi
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `Invoice-${invoice.id}.pdf`;
+    link.download = `${invoice.invoice_number || `Invoice-${invoice.id}`}.pdf`;
     link.click();
     URL.revokeObjectURL(url);
 };
