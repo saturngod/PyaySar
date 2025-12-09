@@ -1,9 +1,11 @@
+import DashboardController from './DashboardController'
 import CustomerController from './CustomerController'
 import InvoiceController from './InvoiceController'
 import Settings from './Settings'
 import UserPreferenceController from './UserPreferenceController'
 
 const Controllers = {
+    DashboardController: Object.assign(DashboardController, DashboardController),
     CustomerController: Object.assign(CustomerController, CustomerController),
     InvoiceController: Object.assign(InvoiceController, InvoiceController),
     Settings: Object.assign(Settings, Settings),
