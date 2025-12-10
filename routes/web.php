@@ -17,6 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('customers', CustomerController::class);
+    Route::get('/invoices/search-items', [InvoiceController::class, 'searchItems'])->name('invoices.search-items');
     Route::resource('invoices', InvoiceController::class);
     Route::put('/invoices/{invoice}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.status');
     Route::get('/invoices/{invoice}/history', [InvoiceController::class, 'history'])->name('invoices.history');

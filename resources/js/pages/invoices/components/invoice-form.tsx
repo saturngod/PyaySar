@@ -27,7 +27,8 @@ import { cn } from '@/lib/utils';
 import { useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { CalendarIcon, Check, Plus, Trash2, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import axios from 'axios';
 
 export interface Customer {
     id: number;
@@ -72,6 +73,92 @@ interface InvoiceFormProps {
         company_logo?: string;
     } | null;
     className?: string;
+}
+
+interface AutocompleteItemNameProps {
+    value: string;
+    onChange: (value: string) => void;
+    className?: string;
+    placeholder?: string;
+}
+
+function AutocompleteItemName({ value, onChange, className, placeholder }: AutocompleteItemNameProps) {
+    const [open, setOpen] = useState(false);
+    const [results, setResults] = useState<{ name: string }[]>([]);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (!value || value.length <= 5) {
+            setResults([]);
+            setOpen(false);
+            return;
+        }
+
+        const fetchResults = async () => {
+            try {
+                const response = await axios.get(`/invoices/search-items?query=${encodeURIComponent(value)}`);
+                if (response.data && response.data.result) {
+                    setResults(response.data.result);
+                    if (response.data.result.length > 0) {
+                        setOpen(true);
+                    } else {
+                        setOpen(false);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching items", error);
+            }
+        };
+
+        const timer = setTimeout(() => {
+            fetchResults();
+        }, 300);
+
+        return () => clearTimeout(timer);
+
+    }, [value]);
+
+    return (
+        <div className="relative group w-full">
+            <Input
+                ref={inputRef}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className={className}
+                placeholder={placeholder}
+                onBlur={() => setTimeout(() => setOpen(false), 200)}
+                onFocus={() => {
+                    if (value && value.length > 5 && results.length > 0) {
+                        setOpen(true);
+                    }
+                }}
+            />
+            {open && results.length > 0 && (
+                <div className="absolute top-full left-0 w-full mt-1 bg-white border rounded-md shadow-lg z-50 overflow-hidden animate-in fade-in-0 zoom-in-95">
+                    <Command shouldFilter={false}>
+                        <CommandList>
+                            <CommandGroup heading="Suggestions">
+                                {results.map((item, idx) => (
+                                    <CommandItem
+                                        key={idx}
+                                        value={item.name}
+                                        onSelect={() => {
+                                            onChange(item.name);
+                                            setOpen(false);
+                                        }}
+                                        className="cursor-pointer"
+                                    >
+                                        <Check className={cn("mr-2 h-4 w-4", value === item.name ? "opacity-100" : "opacity-0")} />
+                                        {item.name}
+                                    </CommandItem>
+                                ))}
+                            </CommandGroup>
+                        </CommandList>
+                    </Command>
+                </div>
+            )}
+        </div>
+    );
 }
 
 export default function InvoiceForm({
@@ -480,9 +567,9 @@ export default function InvoiceForm({
                                 </>
                             ) : (
                                 <>
-                                    <Input
+                                    <AutocompleteItemName
                                         value={item.item_name}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateItem(index, 'item_name', e.target.value)}
+                                        onChange={(val) => updateItem(index, 'item_name', val)}
                                         className="border-none p-0 text-base font-medium shadow-none focus-visible:ring-0"
                                         placeholder="Item Name"
                                     />

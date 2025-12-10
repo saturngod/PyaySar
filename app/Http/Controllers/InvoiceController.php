@@ -47,6 +47,31 @@ class InvoiceController extends Controller
         ]);
     }
 
+    public function searchItems(Request $request)
+    {
+        $query = $request->input('query');
+
+        if (!$query) {
+             return response()->json(['result' => []]);
+        }
+
+        $items = DB::table('invoice_items')
+            ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+            ->join('users', 'invoices.user_id', '=', 'users.id')
+            ->where('users.id', Auth::id())
+            ->where('invoice_items.item_name', 'LIKE', "%{$query}%")
+            ->select('invoice_items.item_name')
+            ->distinct()
+            ->limit(10)
+            ->get();
+        
+        $results = $items->map(function($item) {
+            return ['name' => $item->item_name];
+        });
+
+        return response()->json(['result' => $results]);
+    }
+
     public function create()
     {
         $customers = Auth::user()->customers()->select('id', 'name', 'email', 'address', 'avatar')->get();
