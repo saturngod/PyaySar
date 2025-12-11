@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
+use App\Models\InvoiceItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 use App\Models\InvoiceStatusHistory;
@@ -55,12 +55,11 @@ class InvoiceController extends Controller
              return response()->json(['result' => []]);
         }
 
-        $items = DB::table('invoice_items')
-            ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
-            ->join('users', 'invoices.user_id', '=', 'users.id')
-            ->where('users.id', Auth::id())
-            ->where('invoice_items.item_name', 'LIKE', "%{$query}%")
-            ->select('invoice_items.item_name')
+        $items = InvoiceItem::whereHas('invoice', function ($q) {
+                $q->where('user_id', Auth::id());
+            })
+            ->where('item_name', 'LIKE', "%{$query}%")
+            ->select('item_name')
             ->distinct()
             ->limit(10)
             ->get();
