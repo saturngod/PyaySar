@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils';
 import { useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { CalendarIcon, Check, Plus, Trash2, X } from 'lucide-react';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 export interface Customer {
@@ -61,17 +61,19 @@ export interface Invoice {
     customer?: Customer;
 }
 
+export interface UserPreference {
+    company_name?: string;
+    company_email?: string;
+    company_address?: string;
+    company_logo?: string;
+}
+
 interface InvoiceFormProps {
     customers: Customer[];
     invoice?: Invoice;
     nextInvoiceNumber?: string;
     readonly?: boolean;
-    userPreference?: {
-        company_name?: string;
-        company_email?: string;
-        company_address?: string;
-        company_logo?: string;
-    } | null;
+    userPreference?: UserPreference | null;
     className?: string;
 }
 
@@ -89,9 +91,11 @@ function AutocompleteItemName({ value, onChange, className, placeholder }: Autoc
 
     useEffect(() => {
         if (!value || value.length <= 5) {
-            setResults([]);
-            setOpen(false);
-            return;
+            const timer = setTimeout(() => {
+                setResults([]);
+                setOpen(false);
+            }, 0);
+            return () => clearTimeout(timer);
         }
 
         const fetchResults = async () => {
@@ -280,7 +284,6 @@ export default function InvoiceForm({
                                 className="text-xl font-bold text-gray-900 border-none p-0 shadow-none focus-visible:ring-0 h-auto rounded-none"
                                 placeholder="INV-..."
                             />
-                            {/* @ts-ignore */}
                             {errors.invoice_number && <p className="text-sm text-red-500">{errors.invoice_number}</p>}
                         </div>
                     )}

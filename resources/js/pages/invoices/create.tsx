@@ -1,11 +1,11 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
-import InvoiceForm, { Customer } from './components/invoice-form';
+import InvoiceForm, { Customer, UserPreference } from './components/invoice-form';
 
 interface CreateProps {
     customers: Customer[];
     nextInvoiceNumber: string;
-    userPreference: any;
+    userPreference: UserPreference;
 }
 
 export default function Create({ customers, nextInvoiceNumber, userPreference }: CreateProps) {

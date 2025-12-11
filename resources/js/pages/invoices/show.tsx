@@ -2,13 +2,13 @@ import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Head, Link } from '@inertiajs/react';
 import { ChevronLeft, Download, Pencil } from 'lucide-react';
-import InvoiceForm, { Customer, Invoice } from './components/invoice-form';
+import InvoiceForm, { Customer, Invoice, UserPreference } from './components/invoice-form';
 import { generateInvoicePdf } from './components/invoice-pdf';
 
 interface ShowProps {
     invoice: Invoice;
     customers: Customer[];
-    userPreference: any;
+    userPreference: UserPreference;
 }
 
 export default function Show({ invoice, customers, userPreference }: ShowProps) {

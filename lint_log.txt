@@ -1,0 +1,79 @@
+
+> lint
+> eslint . --fix
+
+
+/Volumes/X9_2TB/Github/pyaysar/resources/js/pages/customers/components/customer-form-dialog.tsx
+  57:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Volumes/X9_2TB/Github/pyaysar/resources/js/pages/customers/components/customer-form-dialog.tsx:57:13
+  55 |                 _method: 'put',
+  56 |             });
+> 57 |             setNewAvatarPreview(null);
+     |             ^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  58 |         } else {
+  59 |             reset();
+  60 |             setData('_method', 'post');  react-hooks/set-state-in-effect
+
+/Volumes/X9_2TB/Github/pyaysar/resources/js/pages/invoices/components/invoice-form.tsx
+   30:39  error  'useCallback' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   92:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Volumes/X9_2TB/Github/pyaysar/resources/js/pages/invoices/components/invoice-form.tsx:92:13
+  90 |     useEffect(() => {
+  91 |         if (!value || value.length <= 5) {
+> 92 |             setResults([]);
+     |             ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  93 |             setOpen(false);
+  94 |             return;
+  95 |         }  react-hooks/set-state-in-effect
+  283:30  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/ban-ts-comment
+
+/Volumes/X9_2TB/Github/pyaysar/resources/js/pages/invoices/components/status-history-dialog.tsx
+  29:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Volumes/X9_2TB/Github/pyaysar/resources/js/pages/invoices/components/status-history-dialog.tsx:29:13
+  27 |     useEffect(() => {
+  28 |         if (open && invoiceId) {
+> 29 |             setLoading(true);
+     |             ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  30 |             fetch(`/invoices/${invoiceId}/history`)
+  31 |                 .then((res) => res.json())
+  32 |                 .then((data) => {  react-hooks/set-state-in-effect
+  56:49  error  'index' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+
+/Volumes/X9_2TB/Github/pyaysar/resources/js/pages/invoices/create.tsx
+  8:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Volumes/X9_2TB/Github/pyaysar/resources/js/pages/invoices/edit.tsx
+  8:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Volumes/X9_2TB/Github/pyaysar/resources/js/pages/invoices/index.tsx
+  1:10  error  'Badge' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Volumes/X9_2TB/Github/pyaysar/resources/js/pages/invoices/show.tsx
+  11:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Volumes/X9_2TB/Github/pyaysar/resources/js/pages/welcome.tsx
+  14:36  error  'LayoutDashboard' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 11 problems (11 errors, 0 warnings)
+

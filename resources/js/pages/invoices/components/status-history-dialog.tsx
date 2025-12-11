@@ -26,7 +26,7 @@ export function StatusHistoryDialog({ invoiceId, open, onOpenChange }: StatusHis
 
     useEffect(() => {
         if (open && invoiceId) {
-            setLoading(true);
+            const timer = setTimeout(() => setLoading(true), 0);
             fetch(`/invoices/${invoiceId}/history`)
                 .then((res) => res.json())
                 .then((data) => {
@@ -37,6 +37,7 @@ export function StatusHistoryDialog({ invoiceId, open, onOpenChange }: StatusHis
                     console.error('Failed to fetch history:', err);
                     setLoading(false);
                 });
+            return () => clearTimeout(timer);
         }
     }, [open, invoiceId]);
 
@@ -53,7 +54,7 @@ export function StatusHistoryDialog({ invoiceId, open, onOpenChange }: StatusHis
                         <div className="text-center text-sm text-gray-500">No history found.</div>
                     ) : (
                         <div className="relative border-l border-gray-200 ml-3 space-y-6">
-                            {history.map((item, index) => (
+                            {history.map((item) => (
                                 <div key={item.id} className="relative pl-6">
                                     <div className="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full border border-white bg-gray-200 dark:border-gray-900 dark:bg-gray-700" />
                                     <div className="flex flex-col gap-1">

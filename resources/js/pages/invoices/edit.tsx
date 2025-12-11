@@ -1,11 +1,11 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
-import InvoiceForm, { Customer, Invoice } from './components/invoice-form';
+import InvoiceForm, { Customer, Invoice, UserPreference } from './components/invoice-form';
 
 interface EditProps {
     invoice: Invoice;
     customers: Customer[];
-    userPreference: any;
+    userPreference: UserPreference;
 }
 
 export default function Edit({ invoice, customers, userPreference }: EditProps) {

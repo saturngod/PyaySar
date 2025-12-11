@@ -43,24 +43,28 @@ export function CustomerFormDialog({
         _method: isEditing ? 'put' : 'post',
     });
 
-    const [preview, setPreview] = useState<string | null>(null);
+    const [newAvatarPreview, setNewAvatarPreview] = useState<string | null>(null);
 
     useEffect(() => {
-        if (customer) {
-            setData({
-                name: customer.name,
-                email: customer.email,
-                address: customer.address,
-                avatar: null,
-                _method: 'put',
-            });
-            setPreview(customer.avatar ? `/storage/${customer.avatar}` : null);
-        } else {
-            reset();
-            setData('_method', 'post');
-            setPreview(null);
-        }
-    }, [customer, open]); // Removed reset/setData from deps to avoid loops, simplified deps
+        // Use setTimeout to avoid synchronous state updates during rendering causing cascading renders
+        const timer = setTimeout(() => {
+            if (customer) {
+                setData({
+                    name: customer.name,
+                    email: customer.email,
+                    address: customer.address,
+                    avatar: null,
+                    _method: 'put',
+                });
+                setNewAvatarPreview(null);
+            } else {
+                reset();
+                setData('_method', 'post');
+                setNewAvatarPreview(null);
+            }
+        }, 0);
+        return () => clearTimeout(timer);
+    }, [customer, open, reset, setData]);
 
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -70,7 +74,7 @@ export function CustomerFormDialog({
         post(url, {
             onSuccess: () => {
                 reset();
-                setPreview(null);
+                setNewAvatarPreview(null);
                 onOpenChange(false);
             },
         });
@@ -80,7 +84,7 @@ export function CustomerFormDialog({
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             setData('avatar', file);
-            setPreview(URL.createObjectURL(file));
+            setNewAvatarPreview(URL.createObjectURL(file));
         }
     };
 
@@ -108,9 +112,9 @@ export function CustomerFormDialog({
 
                     {/* Avatar Upload */}
                     <div className="flex flex-col items-center gap-4">
-                        {preview ? (
+                        {(newAvatarPreview || customer?.avatar) ? (
                             <img
-                                src={preview}
+                                src={newAvatarPreview || `/storage/${customer?.avatar}`}
                                 alt="Avatar Preview"
                                 className="h-24 w-24 rounded-full object-cover border border-gray-200"
                             />
