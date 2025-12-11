@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreInvoiceRequest;
+use App\Http\Requests\UpdateInvoiceStatusRequest;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Models\InvoiceStatusHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-
-use App\Models\InvoiceStatusHistory;
-use App\Http\Requests\UpdateInvoiceStatusRequest;
 
 class InvoiceController extends Controller
 {
@@ -51,20 +51,20 @@ class InvoiceController extends Controller
     {
         $query = $request->input('query');
 
-        if (!$query) {
-             return response()->json(['result' => []]);
+        if (! $query) {
+            return response()->json(['result' => []]);
         }
 
         $items = InvoiceItem::whereHas('invoice', function ($q) {
-                $q->where('user_id', Auth::id());
-            })
+            $q->where('user_id', Auth::id());
+        })
             ->where('item_name', 'LIKE', "%{$query}%")
             ->select('item_name')
             ->distinct()
             ->limit(10)
             ->get();
-        
-        $results = $items->map(function($item) {
+
+        $results = $items->map(function ($item) {
             return ['name' => $item->item_name];
         });
 
@@ -76,7 +76,7 @@ class InvoiceController extends Controller
         $customers = Auth::user()->customers()->select('id', 'name', 'email', 'address', 'avatar')->get();
         // Simple logic for next invoice number (could be improved)
         $nextId = (Invoice::max('id') ?? 0) + 1;
-        $nextInvoiceNumber = 'INV-' . $nextId;
+        $nextInvoiceNumber = 'INV-'.$nextId;
 
         return Inertia::render('invoices/create', [
             'customers' => $customers,
@@ -85,15 +85,15 @@ class InvoiceController extends Controller
         ]);
     }
 
-    public function store(\App\Http\Requests\StoreInvoiceRequest $request)
+    public function store(StoreInvoiceRequest $request)
     {
         $validated = $request->validated();
-        
+
         // Calculate totals
         $subTotal = collect($validated['items'])->sum(function ($item) {
             return $item['qty'] * $item['price'];
         });
-        
+
         // Assuming no discount logic in request for now since it wasn't in the form explicitly yet, but model supports it.
         // We can add discount later if needed.
         $total = $subTotal; // - discount
@@ -161,7 +161,7 @@ class InvoiceController extends Controller
         ]);
     }
 
-    public function update(\App\Http\Requests\StoreInvoiceRequest $request, Invoice $invoice)
+    public function update(StoreInvoiceRequest $request, Invoice $invoice)
     {
         if ($invoice->user_id !== Auth::id()) {
             abort(403);
@@ -223,9 +223,9 @@ class InvoiceController extends Controller
         if ($invoice->user_id !== Auth::id()) {
             abort(403);
         }
-        
+
         $invoice->delete();
-        
+
         return redirect()->route('invoices.index')->with('success', 'Invoice deleted successfully.');
     }
 

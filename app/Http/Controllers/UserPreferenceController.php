@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserPreference;
 use Illuminate\Http\Request;
-
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use App\Models\UserPreference;
+use Inertia\Inertia;
 
 class UserPreferenceController extends Controller
 {
     public function edit()
     {
-        $preference = Auth::user()->preference ?? new UserPreference();
+        $preference = Auth::user()->preference ?? new UserPreference;
 
         return Inertia::render('settings/preference', [
             'preference' => $preference,

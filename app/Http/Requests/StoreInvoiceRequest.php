@@ -24,7 +24,7 @@ class StoreInvoiceRequest extends FormRequest
         $invoiceId = $this->route('invoice') ? $this->route('invoice')->id : null;
 
         return [
-            'invoice_number' => 'required|string|max:255|unique:invoices,invoice_number,' . $invoiceId,
+            'invoice_number' => 'required|string|max:255|unique:invoices,invoice_number,'.$invoiceId,
             'customer_id' => 'required|exists:customers,id',
             'open_date' => 'required|date',
             'due_date' => 'nullable|date|after_or_equal:open_date',

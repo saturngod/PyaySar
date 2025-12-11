@@ -1,11 +1,11 @@
 <?php
 
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InvoiceController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
