@@ -13,7 +13,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { FileText, LayoutGrid, Settings, Users } from 'lucide-react';
+import { FileText, LayoutGrid, Package, Settings, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
@@ -27,6 +27,11 @@ export function AppSidebar() {
             title: 'Customers',
             href: '/customers',
             icon: Users,
+        },
+        {
+            title: 'Items',
+            href: '/items',
+            icon: Package,
         },
         {
             title: 'Invoices',

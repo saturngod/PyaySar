@@ -61,6 +61,11 @@ class User extends Authenticatable
         return $this->hasMany(Invoice::class);
     }
 
+    public function items(): HasMany
+    {
+        return $this->hasMany(Item::class);
+    }
+
     public function preference()
     {
         return $this->hasOne(UserPreference::class);

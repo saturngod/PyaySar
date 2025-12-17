@@ -3,6 +3,7 @@
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ItemController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -17,6 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('customers', CustomerController::class);
+    Route::resource('items', ItemController::class);
     Route::get('/invoices/search-items', [InvoiceController::class, 'searchItems'])->name('invoices.search-items');
     Route::resource('invoices', InvoiceController::class);
     Route::put('/invoices/{invoice}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.status');

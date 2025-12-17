@@ -1,6 +1,14 @@
 // import { Badge } from '@/components/ui/badge'; // Removed unused import
 import { Button } from '@/components/ui/button';
 import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import {
     Table,
     TableBody,
     TableCell,
@@ -69,6 +77,21 @@ const getStatusColor = (status: string) => {
 export default function Index({ invoices, filters, customers }: IndexProps) {
     const [historyOpen, setHistoryOpen] = useState(false);
     const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(null);
+    const [invoiceToDelete, setInvoiceToDelete] = useState<Invoice | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const handleDelete = () => {
+        if (invoiceToDelete) {
+            setIsDeleting(true);
+            router.delete(`/invoices/${invoiceToDelete.id}`, {
+                preserveScroll: true,
+                onFinish: () => {
+                    setIsDeleting(false);
+                    setInvoiceToDelete(null);
+                },
+            });
+        }
+    };
 
     const handleStatusChange = (invoiceId: number, newStatus: string) => {
         router.put(`/invoices/${invoiceId}/status`, {
@@ -180,11 +203,7 @@ export default function Index({ invoices, filters, customers }: IndexProps) {
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
                                                         className="text-red-600 focus:text-red-600 cursor-pointer"
-                                                        onClick={() => {
-                                                            if (confirm('Are you sure?')) {
-                                                                router.delete(`/invoices/${invoice.id}`);
-                                                            }
-                                                        }}
+                                                        onClick={() => setInvoiceToDelete(invoice)}
                                                     >
                                                         Delete
                                                     </DropdownMenuItem>
@@ -204,6 +223,25 @@ export default function Index({ invoices, filters, customers }: IndexProps) {
                 onOpenChange={setHistoryOpen}
                 invoiceId={selectedInvoiceId}
             />
-        </AppLayout>
+
+            <Dialog open={!!invoiceToDelete} onOpenChange={(open) => !open && setInvoiceToDelete(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Are you absolutely sure?</DialogTitle>
+                        <DialogDescription>
+                            This action cannot be undone. This will permanently delete the invoice "{invoiceToDelete?.invoice_number || `INV-${invoiceToDelete?.id}`}".
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setInvoiceToDelete(null)} disabled={isDeleting}>
+                            Cancel
+                        </Button>
+                        <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+                            {isDeleting ? 'Deleting...' : 'Delete'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </AppLayout >
     );
 }
