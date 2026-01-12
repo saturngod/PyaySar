@@ -13,7 +13,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { FileText, LayoutGrid, Settings, Users } from 'lucide-react';
+import { Bot, FileText, LayoutGrid, Settings, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
@@ -32,6 +32,11 @@ export function AppSidebar() {
             title: 'Invoices',
             href: '/invoices',
             icon: FileText,
+        },
+        {
+            title: 'AI Assistance',
+            href: '/ai',
+            icon: Bot,
         },
         {
             title: 'Preference',

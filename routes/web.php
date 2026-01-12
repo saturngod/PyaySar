@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AIController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
@@ -21,6 +22,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('invoices', InvoiceController::class);
     Route::put('/invoices/{invoice}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.status');
     Route::get('/invoices/{invoice}/history', [InvoiceController::class, 'history'])->name('invoices.history');
+
+    Route::get('/ai', [AIController::class, 'index'])->name('ai.index');
+    Route::post('/ai/chat', [AIController::class, 'chat'])->name('ai.chat');
 });
 
 require __DIR__.'/settings.php';
