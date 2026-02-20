@@ -36,6 +36,11 @@ const sidebarNavItems: NavItem[] = [
         href: '/settings/preference',
         icon: null,
     },
+    {
+        title: 'PDF Setting',
+        href: '/settings/pdf',
+        icon: null,
+    },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {

@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Head, Link } from '@inertiajs/react';
 import { ChevronLeft, Download, Pencil } from 'lucide-react';
 import InvoiceForm, { Customer, Invoice, UserPreference } from './components/invoice-form';
-import { generateInvoicePdf } from './components/invoice-pdf';
 
 interface ShowProps {
     invoice: Invoice;
@@ -12,9 +11,6 @@ interface ShowProps {
 }
 
 export default function Show({ invoice, customers, userPreference }: ShowProps) {
-    const handleDownloadPdf = () => {
-        generateInvoicePdf(invoice, userPreference);
-    };
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Invoices', href: '/invoices' }, { title: invoice.invoice_number || `INV-${invoice.id}`, href: `/invoices/${invoice.id}` }]}>
@@ -27,9 +23,11 @@ export default function Show({ invoice, customers, userPreference }: ShowProps) 
                         Back to Invoices
                     </Link>
                     <div className="flex gap-2">
-                        <Button variant="outline" onClick={handleDownloadPdf}>
-                            <Download className="mr-2 h-4 w-4" /> Download PDF
-                        </Button>
+                        <a href={`/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer">
+                            <Button variant="outline">
+                                <Download className="mr-2 h-4 w-4" /> Download PDF
+                            </Button>
+                        </a>
                         <Link href={`/invoices/${invoice.id}/edit`}>
                             <Button variant="outline">
                                 <Pencil className="mr-2 h-4 w-4" /> Edit Invoice

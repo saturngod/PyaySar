@@ -9,7 +9,9 @@ use App\Models\InvoiceItem;
 use App\Models\InvoiceStatusHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class InvoiceController extends Controller
 {
@@ -266,5 +268,19 @@ class InvoiceController extends Controller
             ->get();
 
         return response()->json($history);
+    }
+
+    public function downloadPdf(Invoice $invoice)
+    {
+        $invoice->load(['items', 'customer']);
+        $userPreference = Auth::user()->preference;
+        $paperSize = $userPreference->pdf_paper_size ?? 'a4';
+
+        return Pdf::view('pdf.invoice', [
+            'invoice' => $invoice,
+            'userPreference' => $userPreference,
+        ])
+            ->format($paperSize)
+            ->name("invoice-{$invoice->invoice_number}.pdf");
     }
 }

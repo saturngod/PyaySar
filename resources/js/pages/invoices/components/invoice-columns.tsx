@@ -12,7 +12,7 @@ import { MoreHorizontal } from 'lucide-react';
 interface Invoice {
     id: number;
     total: string;
-    status: 'Draft' | 'Sent' | 'Reject' | 'Received';
+    status: 'Draft' | 'Sent' | 'Rejected' | 'Paid';
     open_date: string;
     customer?: {
         name: string;
@@ -26,11 +26,11 @@ interface ColumnsProps {
 
 const getStatusColor = (status: string) => {
     switch (status) {
-        case 'Received':
+        case 'Paid':
             return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
         case 'Sent':
             return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-        case 'Reject':
+        case 'Rejected':
             return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
         default:
             return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400';

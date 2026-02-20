@@ -17,6 +17,7 @@ interface Customer {
     id: number;
     name: string;
     email: string;
+    avatar?: string;
     address: string;
     created_at: string;
 }
@@ -79,7 +80,22 @@ export default function Index({ customers }: IndexProps) {
                             ) : (
                                 customers.map((customer) => (
                                     <TableRow key={customer.id}>
-                                        <TableCell>{customer.name}</TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                {customer.avatar ? (
+                                                    <img 
+                                                        src={customer.avatar.startsWith('http') ? customer.avatar : `/storage/${customer.avatar}`} 
+                                                        alt={customer.name} 
+                                                        className="h-8 w-8 shrink-0 rounded-full object-cover" 
+                                                    />
+                                                ) : (
+                                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-500">
+                                                        {customer.name.substring(0, 2).toUpperCase()}
+                                                    </div>
+                                                )}
+                                                <span className="font-medium">{customer.name}</span>
+                                            </div>
+                                        </TableCell>
                                         <TableCell>{customer.email}</TableCell>
                                         <TableCell>{customer.address}</TableCell>
                                         <TableCell className="text-right">

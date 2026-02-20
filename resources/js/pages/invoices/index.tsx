@@ -34,7 +34,7 @@ interface Invoice {
     id: number;
     invoice_number?: string;
     total: string;
-    status: 'Draft' | 'Sent' | 'Reject' | 'Received';
+    status: 'Draft' | 'Sent' | 'Rejected' | 'Paid';
     open_date: string;
     customer?: {
         name: string;
@@ -55,11 +55,11 @@ interface IndexProps {
 
 const getStatusColor = (status: string) => {
     switch (status) {
-        case 'Received':
-            return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-green-200';
+        case 'Paid':
+            return 'bg-green-100 text-green-800';
         case 'Sent':
-            return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200';
-        case 'Reject':
+            return 'bg-blue-100 text-blue-800';
+        case 'Rejected':
             return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200';
         default:
             return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400 border-gray-200';
@@ -146,8 +146,8 @@ export default function Index({ invoices, filters, customers }: IndexProps) {
                                                 <SelectContent>
                                                     <SelectItem value="Draft">Draft</SelectItem>
                                                     <SelectItem value="Sent">Sent</SelectItem>
-                                                    <SelectItem value="Received">Received</SelectItem>
-                                                    <SelectItem value="Reject">Reject</SelectItem>
+                                                    <SelectItem value="Paid">Paid</SelectItem>
+                                                    <SelectItem value="Rejected">Rejected</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </TableCell>

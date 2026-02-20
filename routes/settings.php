@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Settings\PasswordController;
+use App\Http\Controllers\Settings\PdfSettingController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\TwoFactorAuthenticationController;
 use App\Http\Controllers\UserPreferenceController;
@@ -29,4 +30,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('settings/preference', [UserPreferenceController::class, 'edit'])->name('preference.edit');
     Route::post('settings/preference', [UserPreferenceController::class, 'update'])->name('preference.update');
+
+    Route::get('settings/pdf', [PdfSettingController::class, 'edit'])->name('pdf.edit');
+    Route::post('settings/pdf', [PdfSettingController::class, 'update'])->name('pdf.update');
 });

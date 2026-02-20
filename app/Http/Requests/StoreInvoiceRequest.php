@@ -28,7 +28,7 @@ class StoreInvoiceRequest extends FormRequest
             'customer_id' => 'required|exists:customers,id',
             'open_date' => 'required|date',
             'due_date' => 'nullable|date|after_or_equal:open_date',
-            'status' => 'required|in:Draft,Sent,Received,Reject',
+            'status' => 'required|in:Draft,Sent,Paid,Rejected',
             'currency' => 'required|in:USD,MMK',
             'items' => 'required|array|min:1',
             'items.*.item_name' => 'required|string|max:255',

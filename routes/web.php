@@ -22,6 +22,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('invoices', InvoiceController::class);
     Route::put('/invoices/{invoice}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.status');
     Route::get('/invoices/{invoice}/history', [InvoiceController::class, 'history'])->name('invoices.history');
+    Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])
+        ->middleware('invoice.owner')
+        ->name('invoices.pdf');
 
     Route::get('/ai', [AIController::class, 'index'])->name('ai.index');
     Route::post('/ai/chat', [AIController::class, 'chat'])->name('ai.chat');

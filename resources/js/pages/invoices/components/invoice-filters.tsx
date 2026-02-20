@@ -106,8 +106,8 @@ export function InvoiceFilters({ filters, customers }: FilterProps) {
                     <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="Draft">Draft</SelectItem>
                     <SelectItem value="Sent">Sent</SelectItem>
-                    <SelectItem value="Received">Received</SelectItem>
-                    <SelectItem value="Reject">Reject</SelectItem>
+                    <SelectItem value="Paid">Paid</SelectItem>
+                    <SelectItem value="Rejected">Rejected</SelectItem>
                 </SelectContent>
             </Select>
 

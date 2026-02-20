@@ -411,8 +411,8 @@ export default function InvoiceForm({
                                     <SelectContent>
                                         <SelectItem value="Draft">Draft</SelectItem>
                                         <SelectItem value="Sent">Sent</SelectItem>
-                                        <SelectItem value="Received">Received</SelectItem>
-                                        <SelectItem value="Reject">Reject</SelectItem>
+                                        <SelectItem value="Paid">Paid</SelectItem>
+                                        <SelectItem value="Rejected">Rejected</SelectItem>
                                     </SelectContent>
                                 </Select>
                             )}
@@ -477,7 +477,7 @@ export default function InvoiceForm({
                                     {selectedCustomer ? (
                                         selectedCustomer.avatar ? (
                                             <img
-                                                src={`/storage/${selectedCustomer.avatar}`}
+                                                src={selectedCustomer.avatar.startsWith('http') ? selectedCustomer.avatar : `/storage/${selectedCustomer.avatar}`}
                                                 alt="Customer Avatar"
                                                 className="h-full w-full rounded-full object-cover"
                                             />
@@ -526,7 +526,7 @@ export default function InvoiceForm({
                         <div className="mb-4">
                             {selectedCustomer.avatar ? (
                                 <img
-                                    src={`/storage/${selectedCustomer.avatar}`}
+                                    src={selectedCustomer.avatar.startsWith('http') ? selectedCustomer.avatar : `/storage/${selectedCustomer.avatar}`}
                                     alt="Customer Avatar"
                                     className="h-16 w-16 object-cover rounded-full border border-gray-100"
                                 />
@@ -557,7 +557,10 @@ export default function InvoiceForm({
                     <div className="col-span-6">Description</div>
                     <div className="col-span-2 text-right">Qty</div>
                     <div className="col-span-2 text-right">Price</div>
-                    <div className="col-span-2 text-right">Amount</div>
+                    <div className="col-span-2 flex justify-end text-right">
+                        <span className="flex-1">Amount</span>
+                        {!readonly && <div className="w-6 ml-2 shrink-0"></div>}
+                    </div>
                 </div>
 
                 {data.items.map((item, index) => (
@@ -601,7 +604,7 @@ export default function InvoiceForm({
                         </div>
                         <div className="col-span-2 text-right">
                             {readonly ? (
-                                <div className="flex h-9 items-center justify-end">{Number(item.price).toFixed(2)}</div>
+                                <div className="flex h-9 items-center justify-end">{Number(item.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                             ) : (
                                 <Input
                                     type="number"
@@ -613,18 +616,20 @@ export default function InvoiceForm({
                                 />
                             )}
                         </div>
-                        <div className="col-span-2 flex h-9 items-center justify-end gap-2 text-right font-medium">
-                            {(item.qty * item.price).toFixed(2)}
+                        <div className="col-span-2 flex h-9 items-center justify-end text-right font-medium">
+                            <span className="flex-1">{(item.qty * item.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                             {!readonly && (
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => removeItem(index)}
-                                    className="h-6 w-6 text-gray-300 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
+                                <div className="w-6 ml-2 shrink-0 flex justify-center">
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => removeItem(index)}
+                                        className="h-6 w-6 text-gray-300 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -688,16 +693,16 @@ export default function InvoiceForm({
                 </div>
 
                 <div className="w-1/3 space-y-4">
-                    <div className="flex justify-between text-sm">
+                    <div className={cn("flex justify-between text-sm", !readonly && "pr-8")}>
                         <span className="font-medium text-gray-500">Subtotal</span>
                         <span className="font-medium text-gray-900">
-                            {data.currency} {subTotal.toFixed(2)}
+                            {data.currency} {subTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                     </div>
-                    <div className="border-t border-dashed border-gray-200 pt-4 flex justify-between items-center">
+                    <div className={cn("border-t border-dashed border-gray-200 pt-4 flex justify-between items-center", !readonly && "pr-8")}>
                         <span className="font-semibold text-gray-900">Total Amount</span>
                         <span className="font-bold text-gray-900">
-                            {data.currency} {total.toFixed(2)}
+                            {data.currency} {total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                     </div>
 

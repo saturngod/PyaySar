@@ -12,6 +12,10 @@ class UserPreference extends Model
         'company_email',
         'company_address',
         'company_logo',
+        'pdf_footer_message',
+        'pdf_paper_size',
+        'pdf_font',
+        'pdf_primary_color',
     ];
 
     public function user()

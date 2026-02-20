@@ -22,7 +22,7 @@ class UpdateInvoiceStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => 'required|in:Draft,Sent,Received,Reject',
+            'status' => 'required|in:Draft,Sent,Paid,Rejected',
         ];
     }
 }
