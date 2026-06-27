@@ -44,9 +44,7 @@ class InvoiceController extends Controller
 
         $items = $this->invoices->searchItems(Auth::user(), $query);
 
-        $results = array_map(fn ($name) => ['name' => $name], $items);
-
-        return response()->json(['result' => $results]);
+        return response()->json(['result' => $items]);
     }
 
     public function create()

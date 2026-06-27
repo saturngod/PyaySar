@@ -80,17 +80,18 @@ interface InvoiceFormProps {
 interface AutocompleteItemNameProps {
     value: string;
     onChange: (value: string) => void;
+    onSelectItem?: (item: { id?: number; name: string; description?: string; price?: number }) => void;
     className?: string;
     placeholder?: string;
 }
 
-function AutocompleteItemName({ value, onChange, className, placeholder }: AutocompleteItemNameProps) {
+function AutocompleteItemName({ value, onChange, onSelectItem, className, placeholder }: AutocompleteItemNameProps) {
     const [open, setOpen] = useState(false);
-    const [results, setResults] = useState<{ name: string }[]>([]);
+    const [results, setResults] = useState<{ id?: number; name: string; description?: string; price?: number }[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (!value || value.length <= 5) {
+        if (!value || value.length < 2) {
             const timer = setTimeout(() => {
                 setResults([]);
                 setOpen(false);
@@ -132,7 +133,7 @@ function AutocompleteItemName({ value, onChange, className, placeholder }: Autoc
                 placeholder={placeholder}
                 onBlur={() => setTimeout(() => setOpen(false), 200)}
                 onFocus={() => {
-                    if (value && value.length > 5 && results.length > 0) {
+                    if (value && value.length >= 2 && results.length > 0) {
                         setOpen(true);
                     }
                 }}
@@ -148,12 +149,18 @@ function AutocompleteItemName({ value, onChange, className, placeholder }: Autoc
                                         value={item.name}
                                         onSelect={() => {
                                             onChange(item.name);
+                                            onSelectItem?.(item);
                                             setOpen(false);
                                         }}
                                         className="cursor-pointer"
                                     >
                                         <Check className={cn("mr-2 h-4 w-4", value === item.name ? "opacity-100" : "opacity-0")} />
-                                        {item.name}
+                                        <span>{item.name}</span>
+                                        {typeof item.price === 'number' && (
+                                            <span className="ml-auto text-xs text-gray-400">
+                                                {item.price.toFixed(2)}
+                                            </span>
+                                        )}
                                     </CommandItem>
                                 ))}
                             </CommandGroup>
@@ -573,6 +580,19 @@ export default function InvoiceForm({
                                     <AutocompleteItemName
                                         value={item.item_name}
                                         onChange={(val) => updateItem(index, 'item_name', val)}
+                                        onSelectItem={(selected) => {
+                                            const newItems = [...data.items];
+                                            const qty = Number(newItems[index].qty) || 1;
+                                            const price = typeof selected.price === 'number' ? selected.price : Number(newItems[index].price);
+                                            newItems[index] = {
+                                                ...newItems[index],
+                                                item_name: selected.name,
+                                                description: newItems[index].description || selected.description || '',
+                                                price,
+                                                total_price: qty * price,
+                                            };
+                                            setData('items', newItems);
+                                        }}
                                         className="border-none p-0 text-base font-medium shadow-none focus-visible:ring-0"
                                         placeholder="Item Name"
                                     />

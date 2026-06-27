@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Models\Invoice;
-use App\Models\InvoiceItem;
 use App\Models\InvoiceStatusHistory;
+use App\Models\Item;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -147,18 +147,21 @@ class InvoiceService
     }
 
     /**
-     * @return array<int, string>
+     * @return array<int, array{id: int, name: string, description: ?string, price: float}>
      */
     public function searchItems(User $user, string $query): array
     {
-        return InvoiceItem::whereHas('invoice', function ($q) use ($user) {
-            $q->where('user_id', $user->id);
-        })
-            ->where('item_name', 'LIKE', "%{$query}%")
-            ->select('item_name')
-            ->distinct()
+        return $user->items()
+            ->where('name', 'LIKE', "%{$query}%")
+            ->orderBy('name')
             ->limit(10)
-            ->pluck('item_name')
+            ->get()
+            ->map(fn (Item $item) => [
+                'id' => $item->id,
+                'name' => $item->name,
+                'description' => $item->description,
+                'price' => (float) $item->price,
+            ])
             ->all();
     }
 }
