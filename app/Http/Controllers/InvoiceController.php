@@ -5,38 +5,25 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Requests\UpdateInvoiceStatusRequest;
 use App\Models\Invoice;
-use App\Models\InvoiceItem;
-use App\Models\InvoiceStatusHistory;
+use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class InvoiceController extends Controller
 {
+    public function __construct(protected InvoiceService $invoices) {}
+
     public function index(Request $request)
     {
         $filters = $request->only(['status', 'date_from', 'date_to', 'customer_id']);
 
-        $invoices = Auth::user()->invoices()
-            ->with(['customer:id,name'])
-            ->when($request->filled('status'), function ($query) use ($request) {
-                if ($request->status !== 'all') {
-                    $query->where('status', $request->status);
-                }
-            })
-            ->when($request->filled('date_from'), function ($query) use ($request) {
-                $query->whereDate('open_date', '>=', $request->date_from);
-            })
-            ->when($request->filled('date_to'), function ($query) use ($request) {
-                $query->whereDate('open_date', '<=', $request->date_to);
-            })
-            ->when($request->filled('customer_id'), function ($query) use ($request) {
-                if ($request->customer_id !== 'all') {
-                    $query->where('customer_id', $request->customer_id);
-                }
-            })
-            ->orderBy('created_at', 'desc')
-            ->get(); // Using get() for now, pagination can be added later if needed
+        $invoices = $this->invoices->list(Auth::user(), [
+            'status' => $request->status,
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
+            'customer_id' => $request->customer_id,
+        ]);
 
         $customers = Auth::user()->customers()->select('id', 'name', 'avatar')->get();
 
@@ -55,18 +42,9 @@ class InvoiceController extends Controller
             return response()->json(['result' => []]);
         }
 
-        $items = InvoiceItem::whereHas('invoice', function ($q) {
-            $q->where('user_id', Auth::id());
-        })
-            ->where('item_name', 'LIKE', "%{$query}%")
-            ->select('item_name')
-            ->distinct()
-            ->limit(10)
-            ->get();
+        $items = $this->invoices->searchItems(Auth::user(), $query);
 
-        $results = $items->map(function ($item) {
-            return ['name' => $item->item_name];
-        });
+        $results = array_map(fn ($name) => ['name' => $name], $items);
 
         return response()->json(['result' => $results]);
     }
@@ -87,44 +65,7 @@ class InvoiceController extends Controller
 
     public function store(StoreInvoiceRequest $request)
     {
-        $validated = $request->validated();
-
-        // Calculate totals
-        $subTotal = collect($validated['items'])->sum(function ($item) {
-            return $item['qty'] * $item['price'];
-        });
-
-        // Assuming no discount logic in request for now since it wasn't in the form explicitly yet, but model supports it.
-        // We can add discount later if needed.
-        $total = $subTotal; // - discount
-
-        DB::transaction(function () use ($validated, $subTotal, $total) {
-            $invoice = Auth::user()->invoices()->create([
-                'invoice_number' => $validated['invoice_number'],
-                'customer_id' => $validated['customer_id'],
-                'open_date' => $validated['open_date'],
-                'due_date' => $validated['due_date'] ?? null,
-                'status' => $validated['status'],
-                'currency' => $validated['currency'],
-                'notes' => $validated['notes'] ?? null,
-                'bank_account_info' => $validated['bank_account_info'] ?? null,
-                'sub_total' => $subTotal,
-                'total' => $total,
-            ]);
-
-            // Track initial status history (optional, or assuming 'Draft' means no history yet? Usually good to track)
-            // But usually history tracks *changes*. Let's leave initial creation alone for now unless requested.
-
-            foreach ($validated['items'] as $item) {
-                $invoice->items()->create([
-                    'item_name' => $item['item_name'],
-                    'description' => $item['description'] ?? null,
-                    'qty' => $item['qty'],
-                    'price' => $item['price'],
-                    'total_price' => $item['qty'] * $item['price'],
-                ]);
-            }
-        });
+        $this->invoices->create(Auth::user(), $request->validated());
 
         return redirect()->route('invoices.index')->with('success', 'Invoice created successfully.');
     }
@@ -167,53 +108,7 @@ class InvoiceController extends Controller
             abort(403);
         }
 
-        $validated = $request->validated();
-
-        $subTotal = collect($validated['items'])->sum(function ($item) {
-            return $item['qty'] * $item['price'];
-        });
-        $total = $subTotal;
-
-        DB::transaction(function () use ($invoice, $validated, $subTotal, $total) {
-            $oldStatus = $invoice->status;
-            $newStatus = $validated['status'];
-
-            $invoice->update([
-                'invoice_number' => $validated['invoice_number'],
-                'customer_id' => $validated['customer_id'],
-                'open_date' => $validated['open_date'],
-                'due_date' => $validated['due_date'] ?? null,
-                'status' => $newStatus,
-                'currency' => $validated['currency'],
-                'notes' => $validated['notes'] ?? null,
-                'bank_account_info' => $validated['bank_account_info'] ?? null,
-                'sub_total' => $subTotal,
-                'total' => $total,
-            ]);
-
-            if ($oldStatus !== $newStatus) {
-                InvoiceStatusHistory::create([
-                    'invoice_id' => $invoice->id,
-                    'from_status' => $oldStatus,
-                    'to_status' => $newStatus,
-                    'changed_at' => now(),
-                ]);
-            }
-
-            // Sync items: Delete all and recreate (easiest strategy for now)
-            // Or careful sync. Re-creation is safer for data integrity if IDs are not tracked in frontend
-            $invoice->items()->delete();
-
-            foreach ($validated['items'] as $item) {
-                $invoice->items()->create([
-                    'item_name' => $item['item_name'],
-                    'description' => $item['description'] ?? null,
-                    'qty' => $item['qty'],
-                    'price' => $item['price'],
-                    'total_price' => $item['qty'] * $item['price'],
-                ]);
-            }
-        });
+        $this->invoices->update($invoice, $request->validated());
 
         return redirect()->route('invoices.show', $invoice)->with('success', 'Invoice updated successfully.');
     }
@@ -224,7 +119,7 @@ class InvoiceController extends Controller
             abort(403);
         }
 
-        $invoice->delete();
+        $this->invoices->delete($invoice);
 
         return redirect()->route('invoices.index')->with('success', 'Invoice deleted successfully.');
     }
@@ -235,22 +130,7 @@ class InvoiceController extends Controller
             abort(403);
         }
 
-        $validated = $request->validated();
-        $oldStatus = $invoice->status;
-        $newStatus = $validated['status'];
-
-        if ($oldStatus !== $newStatus) {
-            DB::transaction(function () use ($invoice, $oldStatus, $newStatus) {
-                $invoice->update(['status' => $newStatus]);
-
-                InvoiceStatusHistory::create([
-                    'invoice_id' => $invoice->id,
-                    'from_status' => $oldStatus,
-                    'to_status' => $newStatus,
-                    'changed_at' => now(),
-                ]);
-            });
-        }
+        $this->invoices->changeStatus($invoice, $request->validated()['status']);
 
         return back()->with('success', 'Invoice status updated.');
     }
@@ -261,10 +141,6 @@ class InvoiceController extends Controller
             abort(403);
         }
 
-        $history = InvoiceStatusHistory::where('invoice_id', $invoice->id)
-            ->orderBy('changed_at', 'desc')
-            ->get();
-
-        return response()->json($history);
+        return response()->json($invoice->statusHistories()->orderBy('changed_at', 'desc')->get());
     }
 }

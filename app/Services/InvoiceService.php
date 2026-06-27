@@ -1,0 +1,164 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Invoice;
+use App\Models\InvoiceItem;
+use App\Models\InvoiceStatusHistory;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+
+class InvoiceService
+{
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return array<int, Invoice>
+     */
+    public function list(User $user, array $filters = []): array
+    {
+        return $user->invoices()
+            ->with(['customer:id,name'])
+            ->when(isset($filters['status']) && $filters['status'] !== 'all', function ($query) use ($filters) {
+                $query->where('status', $filters['status']);
+            })
+            ->when(isset($filters['date_from']), function ($query) use ($filters) {
+                $query->whereDate('open_date', '>=', $filters['date_from']);
+            })
+            ->when(isset($filters['date_to']), function ($query) use ($filters) {
+                $query->whereDate('open_date', '<=', $filters['date_to']);
+            })
+            ->when(isset($filters['customer_id']) && $filters['customer_id'] !== 'all', function ($query) use ($filters) {
+                $query->where('customer_id', $filters['customer_id']);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function create(User $user, array $data): Invoice
+    {
+        $subTotal = collect($data['items'])->sum(fn ($item) => $item['qty'] * $item['price']);
+        $total = $subTotal;
+
+        return DB::transaction(function () use ($user, $data, $subTotal, $total) {
+            $invoice = $user->invoices()->create([
+                'invoice_number' => $data['invoice_number'],
+                'customer_id' => $data['customer_id'],
+                'open_date' => $data['open_date'],
+                'due_date' => $data['due_date'] ?? null,
+                'status' => $data['status'],
+                'currency' => $data['currency'],
+                'notes' => $data['notes'] ?? null,
+                'bank_account_info' => $data['bank_account_info'] ?? null,
+                'sub_total' => $subTotal,
+                'total' => $total,
+            ]);
+
+            foreach ($data['items'] as $item) {
+                $invoice->items()->create([
+                    'item_name' => $item['item_name'],
+                    'description' => $item['description'] ?? null,
+                    'qty' => $item['qty'],
+                    'price' => $item['price'],
+                    'total_price' => $item['qty'] * $item['price'],
+                ]);
+            }
+
+            return $invoice;
+        });
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    public function update(Invoice $invoice, array $data): Invoice
+    {
+        $subTotal = collect($data['items'])->sum(fn ($item) => $item['qty'] * $item['price']);
+        $total = $subTotal;
+
+        DB::transaction(function () use ($invoice, $data, $subTotal, $total) {
+            $oldStatus = $invoice->status;
+            $newStatus = $data['status'];
+
+            $invoice->update([
+                'invoice_number' => $data['invoice_number'],
+                'customer_id' => $data['customer_id'],
+                'open_date' => $data['open_date'],
+                'due_date' => $data['due_date'] ?? null,
+                'status' => $newStatus,
+                'currency' => $data['currency'],
+                'notes' => $data['notes'] ?? null,
+                'bank_account_info' => $data['bank_account_info'] ?? null,
+                'sub_total' => $subTotal,
+                'total' => $total,
+            ]);
+
+            if ($oldStatus !== $newStatus) {
+                InvoiceStatusHistory::create([
+                    'invoice_id' => $invoice->id,
+                    'from_status' => $oldStatus,
+                    'to_status' => $newStatus,
+                    'changed_at' => now(),
+                ]);
+            }
+
+            $invoice->items()->delete();
+
+            foreach ($data['items'] as $item) {
+                $invoice->items()->create([
+                    'item_name' => $item['item_name'],
+                    'description' => $item['description'] ?? null,
+                    'qty' => $item['qty'],
+                    'price' => $item['price'],
+                    'total_price' => $item['qty'] * $item['price'],
+                ]);
+            }
+        });
+
+        return $invoice->fresh(['items', 'customer']);
+    }
+
+    public function changeStatus(Invoice $invoice, string $status): Invoice
+    {
+        $oldStatus = $invoice->status;
+
+        if ($oldStatus !== $status) {
+            DB::transaction(function () use ($invoice, $oldStatus, $status) {
+                $invoice->update(['status' => $status]);
+
+                InvoiceStatusHistory::create([
+                    'invoice_id' => $invoice->id,
+                    'from_status' => $oldStatus,
+                    'to_status' => $status,
+                    'changed_at' => now(),
+                ]);
+            });
+        }
+
+        return $invoice->fresh(['statusHistories']);
+    }
+
+    public function delete(Invoice $invoice): void
+    {
+        $invoice->delete();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function searchItems(User $user, string $query): array
+    {
+        return InvoiceItem::whereHas('invoice', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
+            ->where('item_name', 'LIKE', "%{$query}%")
+            ->select('item_name')
+            ->distinct()
+            ->limit(10)
+            ->pluck('item_name')
+            ->all();
+    }
+}
