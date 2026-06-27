@@ -73,6 +73,7 @@ export default function ItemForm({ item, className }: ItemFormProps) {
                         onChange={(e) => setData('description', e.target.value)}
                         placeholder="Item Description"
                         rows={4}
+                        maxLength={5000}
                     />
                     {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
                 </div>

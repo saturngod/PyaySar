@@ -6,16 +6,22 @@ use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
 use App\Models\Item;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Inertia\Inertia;
 
 class ItemController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $items = Auth::user()->items()->orderBy('created_at', 'desc')->paginate(10);
+        $items = Auth::user()->items()
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         return Inertia::render('items/index', [
             'items' => $items,
@@ -45,9 +51,7 @@ class ItemController extends Controller
      */
     public function show(Item $item)
     {
-        if ($item->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorize('view', $item);
 
         return Inertia::render('items/show', [
             'item' => $item,
@@ -59,9 +63,7 @@ class ItemController extends Controller
      */
     public function edit(Item $item)
     {
-        if ($item->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorize('update', $item);
 
         return Inertia::render('items/edit', [
             'item' => $item,
@@ -73,9 +75,7 @@ class ItemController extends Controller
      */
     public function update(UpdateItemRequest $request, Item $item)
     {
-        if ($item->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorize('update', $item);
 
         $item->update($request->validated());
 
@@ -87,9 +87,7 @@ class ItemController extends Controller
      */
     public function destroy(Item $item)
     {
-        if ($item->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorize('delete', $item);
 
         $item->delete();
 

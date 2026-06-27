@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\ItemController::index
-* @see app/Http/Controllers/ItemController.php:16
+* @see app/Http/Controllers/ItemController.php:19
 * @route '/items'
 */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\ItemController::index
-* @see app/Http/Controllers/ItemController.php:16
+* @see app/Http/Controllers/ItemController.php:19
 * @route '/items'
 */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ItemController::index
-* @see app/Http/Controllers/ItemController.php:16
+* @see app/Http/Controllers/ItemController.php:19
 * @route '/items'
 */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -35,7 +35,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ItemController::index
-* @see app/Http/Controllers/ItemController.php:16
+* @see app/Http/Controllers/ItemController.php:19
 * @route '/items'
 */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -45,7 +45,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\ItemController::index
-* @see app/Http/Controllers/ItemController.php:16
+* @see app/Http/Controllers/ItemController.php:19
 * @route '/items'
 */
 const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -55,7 +55,7 @@ const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => (
 
 /**
 * @see \App\Http\Controllers\ItemController::index
-* @see app/Http/Controllers/ItemController.php:16
+* @see app/Http/Controllers/ItemController.php:19
 * @route '/items'
 */
 indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -65,7 +65,7 @@ indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ItemController::index
-* @see app/Http/Controllers/ItemController.php:16
+* @see app/Http/Controllers/ItemController.php:19
 * @route '/items'
 */
 indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\ItemController::create
-* @see app/Http/Controllers/ItemController.php:28
+* @see app/Http/Controllers/ItemController.php:34
 * @route '/items/create'
 */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -97,7 +97,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\ItemController::create
-* @see app/Http/Controllers/ItemController.php:28
+* @see app/Http/Controllers/ItemController.php:34
 * @route '/items/create'
 */
 create.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ItemController::create
-* @see app/Http/Controllers/ItemController.php:28
+* @see app/Http/Controllers/ItemController.php:34
 * @route '/items/create'
 */
 create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -116,7 +116,7 @@ create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ItemController::create
-* @see app/Http/Controllers/ItemController.php:28
+* @see app/Http/Controllers/ItemController.php:34
 * @route '/items/create'
 */
 create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -126,7 +126,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
 /**
 * @see \App\Http\Controllers\ItemController::create
-* @see app/Http/Controllers/ItemController.php:28
+* @see app/Http/Controllers/ItemController.php:34
 * @route '/items/create'
 */
 const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -136,7 +136,7 @@ const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => 
 
 /**
 * @see \App\Http\Controllers\ItemController::create
-* @see app/Http/Controllers/ItemController.php:28
+* @see app/Http/Controllers/ItemController.php:34
 * @route '/items/create'
 */
 createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -146,7 +146,7 @@ createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
 
 /**
 * @see \App\Http\Controllers\ItemController::create
-* @see app/Http/Controllers/ItemController.php:28
+* @see app/Http/Controllers/ItemController.php:34
 * @route '/items/create'
 */
 createForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -163,7 +163,7 @@ create.form = createForm
 
 /**
 * @see \App\Http\Controllers\ItemController::store
-* @see app/Http/Controllers/ItemController.php:36
+* @see app/Http/Controllers/ItemController.php:42
 * @route '/items'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -178,7 +178,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\ItemController::store
-* @see app/Http/Controllers/ItemController.php:36
+* @see app/Http/Controllers/ItemController.php:42
 * @route '/items'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -187,7 +187,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\ItemController::store
-* @see app/Http/Controllers/ItemController.php:36
+* @see app/Http/Controllers/ItemController.php:42
 * @route '/items'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -197,7 +197,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\ItemController::store
-* @see app/Http/Controllers/ItemController.php:36
+* @see app/Http/Controllers/ItemController.php:42
 * @route '/items'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -207,7 +207,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\ItemController::store
-* @see app/Http/Controllers/ItemController.php:36
+* @see app/Http/Controllers/ItemController.php:42
 * @route '/items'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -219,10 +219,10 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\ItemController::show
-* @see app/Http/Controllers/ItemController.php:46
+* @see app/Http/Controllers/ItemController.php:52
 * @route '/items/{item}'
 */
-export const show = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+export const show = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: show.url(args, options),
     method: 'get',
 })
@@ -234,10 +234,10 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\ItemController::show
-* @see app/Http/Controllers/ItemController.php:46
+* @see app/Http/Controllers/ItemController.php:52
 * @route '/items/{item}'
 */
-show.url = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+show.url = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { item: args }
     }
@@ -267,50 +267,50 @@ show.url = (args: { item: string | number | { id: string | number } } | [item: s
 
 /**
 * @see \App\Http\Controllers\ItemController::show
-* @see app/Http/Controllers/ItemController.php:46
+* @see app/Http/Controllers/ItemController.php:52
 * @route '/items/{item}'
 */
-show.get = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+show.get = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: show.url(args, options),
     method: 'get',
 })
 
 /**
 * @see \App\Http\Controllers\ItemController::show
-* @see app/Http/Controllers/ItemController.php:46
+* @see app/Http/Controllers/ItemController.php:52
 * @route '/items/{item}'
 */
-show.head = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+show.head = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: show.url(args, options),
     method: 'head',
 })
 
 /**
 * @see \App\Http\Controllers\ItemController::show
-* @see app/Http/Controllers/ItemController.php:46
+* @see app/Http/Controllers/ItemController.php:52
 * @route '/items/{item}'
 */
-const showForm = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+const showForm = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: show.url(args, options),
     method: 'get',
 })
 
 /**
 * @see \App\Http\Controllers\ItemController::show
-* @see app/Http/Controllers/ItemController.php:46
+* @see app/Http/Controllers/ItemController.php:52
 * @route '/items/{item}'
 */
-showForm.get = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+showForm.get = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: show.url(args, options),
     method: 'get',
 })
 
 /**
 * @see \App\Http\Controllers\ItemController::show
-* @see app/Http/Controllers/ItemController.php:46
+* @see app/Http/Controllers/ItemController.php:52
 * @route '/items/{item}'
 */
-showForm.head = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+showForm.head = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: show.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'HEAD',
@@ -324,10 +324,10 @@ show.form = showForm
 
 /**
 * @see \App\Http\Controllers\ItemController::edit
-* @see app/Http/Controllers/ItemController.php:60
+* @see app/Http/Controllers/ItemController.php:64
 * @route '/items/{item}/edit'
 */
-export const edit = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+export const edit = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: edit.url(args, options),
     method: 'get',
 })
@@ -339,10 +339,10 @@ edit.definition = {
 
 /**
 * @see \App\Http\Controllers\ItemController::edit
-* @see app/Http/Controllers/ItemController.php:60
+* @see app/Http/Controllers/ItemController.php:64
 * @route '/items/{item}/edit'
 */
-edit.url = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+edit.url = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { item: args }
     }
@@ -372,50 +372,50 @@ edit.url = (args: { item: string | number | { id: string | number } } | [item: s
 
 /**
 * @see \App\Http\Controllers\ItemController::edit
-* @see app/Http/Controllers/ItemController.php:60
+* @see app/Http/Controllers/ItemController.php:64
 * @route '/items/{item}/edit'
 */
-edit.get = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+edit.get = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
     url: edit.url(args, options),
     method: 'get',
 })
 
 /**
 * @see \App\Http\Controllers\ItemController::edit
-* @see app/Http/Controllers/ItemController.php:60
+* @see app/Http/Controllers/ItemController.php:64
 * @route '/items/{item}/edit'
 */
-edit.head = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+edit.head = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: edit.url(args, options),
     method: 'head',
 })
 
 /**
 * @see \App\Http\Controllers\ItemController::edit
-* @see app/Http/Controllers/ItemController.php:60
+* @see app/Http/Controllers/ItemController.php:64
 * @route '/items/{item}/edit'
 */
-const editForm = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+const editForm = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: edit.url(args, options),
     method: 'get',
 })
 
 /**
 * @see \App\Http\Controllers\ItemController::edit
-* @see app/Http/Controllers/ItemController.php:60
+* @see app/Http/Controllers/ItemController.php:64
 * @route '/items/{item}/edit'
 */
-editForm.get = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+editForm.get = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: edit.url(args, options),
     method: 'get',
 })
 
 /**
 * @see \App\Http\Controllers\ItemController::edit
-* @see app/Http/Controllers/ItemController.php:60
+* @see app/Http/Controllers/ItemController.php:64
 * @route '/items/{item}/edit'
 */
-editForm.head = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+editForm.head = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
     action: edit.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'HEAD',
@@ -429,10 +429,10 @@ edit.form = editForm
 
 /**
 * @see \App\Http\Controllers\ItemController::update
-* @see app/Http/Controllers/ItemController.php:74
+* @see app/Http/Controllers/ItemController.php:76
 * @route '/items/{item}'
 */
-export const update = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+export const update = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
@@ -444,10 +444,10 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\ItemController::update
-* @see app/Http/Controllers/ItemController.php:74
+* @see app/Http/Controllers/ItemController.php:76
 * @route '/items/{item}'
 */
-update.url = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+update.url = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { item: args }
     }
@@ -477,30 +477,30 @@ update.url = (args: { item: string | number | { id: string | number } } | [item:
 
 /**
 * @see \App\Http\Controllers\ItemController::update
-* @see app/Http/Controllers/ItemController.php:74
+* @see app/Http/Controllers/ItemController.php:76
 * @route '/items/{item}'
 */
-update.put = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
+update.put = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     url: update.url(args, options),
     method: 'put',
 })
 
 /**
 * @see \App\Http\Controllers\ItemController::update
-* @see app/Http/Controllers/ItemController.php:74
+* @see app/Http/Controllers/ItemController.php:76
 * @route '/items/{item}'
 */
-update.patch = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
+update.patch = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
     url: update.url(args, options),
     method: 'patch',
 })
 
 /**
 * @see \App\Http\Controllers\ItemController::update
-* @see app/Http/Controllers/ItemController.php:74
+* @see app/Http/Controllers/ItemController.php:76
 * @route '/items/{item}'
 */
-const updateForm = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const updateForm = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -512,10 +512,10 @@ const updateForm = (args: { item: string | number | { id: string | number } } | 
 
 /**
 * @see \App\Http\Controllers\ItemController::update
-* @see app/Http/Controllers/ItemController.php:74
+* @see app/Http/Controllers/ItemController.php:76
 * @route '/items/{item}'
 */
-updateForm.put = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateForm.put = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PUT',
@@ -527,10 +527,10 @@ updateForm.put = (args: { item: string | number | { id: string | number } } | [i
 
 /**
 * @see \App\Http\Controllers\ItemController::update
-* @see app/Http/Controllers/ItemController.php:74
+* @see app/Http/Controllers/ItemController.php:76
 * @route '/items/{item}'
 */
-updateForm.patch = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+updateForm.patch = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: update.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'PATCH',
@@ -547,7 +547,7 @@ update.form = updateForm
 * @see app/Http/Controllers/ItemController.php:88
 * @route '/items/{item}'
 */
-export const destroy = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+export const destroy = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -562,7 +562,7 @@ destroy.definition = {
 * @see app/Http/Controllers/ItemController.php:88
 * @route '/items/{item}'
 */
-destroy.url = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions) => {
+destroy.url = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
     if (typeof args === 'string' || typeof args === 'number') {
         args = { item: args }
     }
@@ -595,7 +595,7 @@ destroy.url = (args: { item: string | number | { id: string | number } } | [item
 * @see app/Http/Controllers/ItemController.php:88
 * @route '/items/{item}'
 */
-destroy.delete = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
+destroy.delete = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
     url: destroy.url(args, options),
     method: 'delete',
 })
@@ -605,7 +605,7 @@ destroy.delete = (args: { item: string | number | { id: string | number } } | [i
 * @see app/Http/Controllers/ItemController.php:88
 * @route '/items/{item}'
 */
-const destroyForm = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+const destroyForm = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: destroy.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'DELETE',
@@ -620,7 +620,7 @@ const destroyForm = (args: { item: string | number | { id: string | number } } |
 * @see app/Http/Controllers/ItemController.php:88
 * @route '/items/{item}'
 */
-destroyForm.delete = (args: { item: string | number | { id: string | number } } | [item: string | number | { id: string | number } ] | string | number | { id: string | number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+destroyForm.delete = (args: { item: number | { id: number } } | [item: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
     action: destroy.url(args, {
         [options?.mergeQuery ? 'mergeQuery' : 'query']: {
             _method: 'DELETE',
