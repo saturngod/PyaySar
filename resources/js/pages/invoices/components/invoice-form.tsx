@@ -723,7 +723,7 @@ export default function InvoiceForm({
 
                     {!readonly && (
                         <div className="pt-8">
-                            <Button type="submit" className="w-full bg-black text-white hover:bg-gray-800" disabled={processing}>
+                            <Button type="submit" className="w-full" disabled={processing}>
                                 {processing ? 'Saving...' : (isEditing ? 'Update Invoice' : 'Create Invoice')}
                             </Button>
                         </div>

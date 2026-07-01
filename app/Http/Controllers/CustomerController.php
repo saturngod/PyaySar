@@ -3,18 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Services\CustomerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class CustomerController extends Controller
 {
+    public function __construct(protected CustomerService $customers) {}
+
     public function index()
     {
-        $customers = Auth::user()->customers()
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $customers = $this->customers->list(Auth::user());
 
         return Inertia::render('customers/index', [
             'customers' => $customers,
@@ -35,11 +35,7 @@ class CustomerController extends Controller
             'avatar' => 'nullable|image|max:1024',
         ]);
 
-        if ($request->hasFile('avatar')) {
-            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
-        }
-
-        Auth::user()->customers()->create($validated);
+        $this->customers->create(Auth::user(), $validated, $request->file('avatar'));
 
         return redirect()->route('customers.index')
             ->with('success', 'Customer created successfully.');
@@ -80,14 +76,7 @@ class CustomerController extends Controller
             'avatar' => 'nullable|image|max:1024',
         ]);
 
-        if ($request->hasFile('avatar')) {
-            if ($customer->avatar) {
-                Storage::disk('public')->delete($customer->avatar);
-            }
-            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
-        }
-
-        $customer->update($validated);
+        $this->customers->update($customer, $validated, $request->file('avatar'));
 
         return redirect()->route('customers.index')
             ->with('success', 'Customer updated successfully.');
@@ -99,11 +88,7 @@ class CustomerController extends Controller
             abort(403);
         }
 
-        if ($customer->avatar) {
-            Storage::disk('public')->delete($customer->avatar);
-        }
-
-        $customer->delete();
+        $this->customers->delete($customer);
 
         return redirect()->route('customers.index')
             ->with('success', 'Customer deleted successfully.');

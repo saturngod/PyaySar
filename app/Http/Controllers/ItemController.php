@@ -5,23 +5,23 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
 use App\Models\Item;
-use Illuminate\Support\Facades\Auth;
+use App\Services\ItemService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ItemController extends Controller
 {
     use AuthorizesRequests;
 
+    public function __construct(protected ItemService $items) {}
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $items = Auth::user()->items()
-            ->with('user')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $items = $this->items->list(Auth::user());
 
         return Inertia::render('items/index', [
             'items' => $items,
@@ -41,7 +41,7 @@ class ItemController extends Controller
      */
     public function store(StoreItemRequest $request)
     {
-        Auth::user()->items()->create($request->validated());
+        $this->items->create(Auth::user(), $request->validated());
 
         return redirect()->route('items.index')->with('success', 'Item created successfully.');
     }
@@ -77,7 +77,7 @@ class ItemController extends Controller
     {
         $this->authorize('update', $item);
 
-        $item->update($request->validated());
+        $this->items->update($item, $request->validated());
 
         return redirect()->route('items.index')->with('success', 'Item updated successfully.');
     }
@@ -89,7 +89,7 @@ class ItemController extends Controller
     {
         $this->authorize('delete', $item);
 
-        $item->delete();
+        $this->items->delete($item);
 
         return redirect()->route('items.index')->with('success', 'Item deleted successfully.');
     }

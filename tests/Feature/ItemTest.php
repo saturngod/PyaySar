@@ -4,7 +4,11 @@ use App\Models\Item;
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
-use function Pest\Laravel\{actingAs, delete, get, post, put};
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\delete;
+use function Pest\Laravel\get;
+use function Pest\Laravel\post;
+use function Pest\Laravel\put;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
