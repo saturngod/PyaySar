@@ -36,6 +36,11 @@ const sidebarNavItems: NavItem[] = [
         href: '/settings/preference',
         icon: null,
     },
+    {
+        title: 'API Tokens',
+        href: '/settings/api-tokens',
+        icon: null,
+    },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
