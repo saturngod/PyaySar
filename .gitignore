@@ -24,3 +24,7 @@ Homestead.yaml
 Thumbs.db
 .claude
 CLAUDE.md
+
+**/caddy
+frankenphp
+frankenphp-worker.php
