@@ -1,92 +1,45 @@
 # Pyaysar MCP Guide
 
-Pyaysar exposes its full feature set — customers, inventory items, invoices (with line items and status history), and dashboard — over the **Model Context Protocol** using the [`laravel/mcp`](https://laravel.com/docs/mcp) package. Any MCP-compatible AI client (Claude Desktop, Cursor, OpenCode, etc.) can read and manage invoice data on a user's behalf.
+MCP (Model Context Protocol) lets AI tools (Claude Desktop, Cursor, etc.) talk to your Pyaysar app. The AI can create invoices, list customers, check dashboard — same as the web UI.
 
-This document describes the two transports, authentication, the complete catalog of tools/resources/prompts, and how to test and extend them.
-
----
-
-## Table of contents
-
-1. [Architecture](#architecture)
-2. [Setup](#setup)
-   - [Web transport (remote clients)](#web-transport-remote-clients)
-   - [Local transport (Artisan)](#local-transport-artisan)
-3. [Connecting an MCP client](#connecting-an-mcp-client)
-4. [User resolution & security](#user-resolution--security)
-5. [Primitive catalog](#primitive-catalog)
-   - [Tools](#tools)
-   - [Resources](#resources)
-   - [Prompts](#prompts)
-6. [Testing](#testing)
-7. [Extending](#extending)
+This guide shows you **how to set it up** and **how to use it**.
 
 ---
 
-## Architecture
+## Two ways to connect
 
-Everything lives under `app/Mcp/`:
+| Way | How it works | When to use |
+|-----|-------------|-------------|
+| **Remote (HTTP)** | AI sends HTTP requests to your server | Your app is running on a server, AI is on another machine |
+| **Local (Artisan)** | AI runs a command on your machine directly | You are developing locally, same machine |
 
-| Path | Responsibility |
-| --- | --- |
-| `Servers/PyaysarServer.php` | The single MCP server. Registers all tools, resources, and prompts. |
-| `Concerns/ResolvesUser.php` | Trait that resolves the acting user per transport. |
-| `Tools/*Tool.php` | 14 tools (writes/actions). |
-| `Resources/*Resource.php` | 4 resources (reads), three of them URI templates. |
-| `Prompts/*Prompt.php` | 2 prompt templates. |
+---
 
-The server is registered in `routes/ai.php` for **both** transports:
+## Way 1: Remote (HTTP) — for production or remote access
+
+### Step 1: Start your app
+
+```bash
+composer run dev
+```
+
+Your app runs at `http://localhost:8000`.
+
+### Step 2: Create an API token
+
+Open `php artisan tinker` and run:
 
 ```php
-Mcp::web('/mcp', PyaysarServer::class)->middleware(['auth:sanctum']);
-Mcp::local('pyaysar', PyaysarServer::class);
+$user = App\Models\User::find(1);
+$token = $user->createToken('my-ai-client')->plainTextToken;
+echo $token;
 ```
 
-All MCP primitives operate on the **same business logic** as the HTTP controllers, via the shared service classes in `app/Services/` (`InvoiceService`, `CustomerService`, `ItemService`). There is no duplicated logic — add a behaviour to the service and both the web UI and MCP get it.
+Copy the token. You need it next.
 
----
+### Step 3: Tell your AI client to connect
 
-## Setup
-
-### Prerequisites
-
-MCP support is already installed (`composer require laravel/mcp laravel/sanctum`). The Sanctum `personal_access_tokens` migration has run and `User` uses the `HasApiTokens` trait.
-
-### Web transport (remote clients)
-
-The web transport is an HTTP endpoint at `POST /mcp` protected by Sanctum token auth. No additional setup is required — it is enabled by `routes/ai.php`.
-
-To grant a client access, issue a token for a user:
-
-```php
-$token = $user->createToken('claude-desktop')->plainTextToken;
-```
-
-The plaintext token is shown once; store it securely. Requests must send it as a Bearer token:
-
-```
-Authorization: Bearer <plain-text-token>
-```
-
-### Local transport (Artisan)
-
-The local transport runs the server as an Artisan process (`php artisan mcp:start pyaysar`). There is no HTTP session and therefore no authenticated user, so you must tell the server which user to act as.
-
-Set `MCP_LOCAL_USER_ID` in `.env` to the ID of the user whose data the server should operate on:
-
-```env
-MCP_LOCAL_USER_ID=1
-```
-
-Without this value, every primitive returns an error instructing you to set it.
-
----
-
-## Connecting an MCP client
-
-### Claude Desktop / Cursor (remote, web transport)
-
-Point the client at the web endpoint with a Sanctum token:
+**Claude Desktop** — edit `claude_desktop_config.json`:
 
 ```json
 {
@@ -94,167 +47,209 @@ Point the client at the web endpoint with a Sanctum token:
     "pyaysar": {
       "url": "http://localhost:8000/mcp",
       "headers": {
-        "Authorization": "Bearer <your-sanctum-token>"
+        "Authorization": "Bearer YOUR_TOKEN_HERE"
       }
     }
   }
 }
 ```
 
-> Serve the app first with `composer run dev` (or any host that reaches `artisan serve`).
+Replace `YOUR_TOKEN_HERE` with the token from Step 2.
 
-### Claude Desktop / OpenCode (local transport)
+**Cursor** — same config in `.cursor/mcp.json`.
 
-Run the local server over `stdio`:
+### Step 4: Use it
+
+Open Claude Desktop (or Cursor). The AI can now:
+- "Show me all invoices" → it calls `list-invoices`
+- "Create a new customer named ABC" → it calls `create-customer`
+- "What's on my dashboard?" → it reads `pyaysar://dashboard`
+
+---
+
+## Way 2: Local (Artisan) — for local development
+
+### Step 1: Set your user ID
+
+In your `.env` file, add:
+
+```
+MCP_LOCAL_USER_ID=1
+```
+
+This tells the MCP server: "Act as user ID 1."
+
+### Step 2: Tell your AI client to connect
+
+**Claude Desktop** — edit `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "pyaysar": {
       "command": "php",
-      "args": ["/absolute/path/to/pyaysar/artisan", "mcp:start", "pyaysar"]
+      "args": ["/full/path/to/pyaysar/artisan", "mcp:start", "pyaysar"]
     }
   }
 }
 ```
 
-The server resolves the user from `MCP_LOCAL_USER_ID`.
+Replace `/full/path/to/pyaysar/` with your actual project path. Example:
+
+```json
+{
+  "mcpServers": {
+    "pyaysar": {
+      "command": "php",
+      "args": ["/Users/you/Code/pyaysar/artisan", "mcp:start", "pyaysar"]
+    }
+  }
+}
+```
+
+**OpenCode** — same config in `opencode.json`:
+
+```json
+{
+  "mcp": {
+    "servers": {
+      "pyaysar": {
+        "type": "local",
+        "command": "php",
+        "args": ["/Users/you/Code/pyaysar/artisan", "mcp:start", "pyaysar"]
+      }
+    }
+  }
+}
+```
+
+### Step 3: Use it
+
+Same as remote — the AI can now manage your invoices, customers, and items.
 
 ---
 
-## User resolution & security
+## What can the AI do?
 
-The `App\Mcp\Concerns\ResolvesUser` trait resolves the acting user for every primitive:
-
-1. **Web transport** — `$request->user()` returns the Sanctum-authenticated user.
-2. **Local transport** — falls back to the user with ID `config('mcp.local_user_id')` (env `MCP_LOCAL_USER_ID`).
-
-Every query is **user-scoped**: invoices, customers, and items are loaded through `$user->invoices()`, `$user->customers()`, `$user->items()`. A request for another user's record (e.g. `invoice://invoices/99` where invoice 99 belongs to someone else) resolves to `null` and returns an error — **records never leak across users**. This mirrors the manual `abort(403)` ownership checks used in the HTTP controllers.
-
----
-
-## Primitive catalog
-
-### Tools
-
-Tools perform actions. Inputs are validated against JSON Schema + Laravel rules. Tools that only read data are annotated `readOnly`; delete tools are annotated `destructive`.
+### Tools (actions — the AI can create, update, delete)
 
 #### Invoices
 
-| Tool | Arguments | Description |
-| --- | --- | --- |
-| `list-invoices` | `status?`, `date_from?`, `date_to?`, `customer_id?` | List invoices, optionally filtered. *(readOnly)* |
-| `create-invoice` | `invoice_number`, `customer_id`, `open_date`, `due_date?`, `status`, `currency`, `items[]`, `notes?`, `bank_account_info?` | Create an invoice; totals are computed from line items. |
-| `update-invoice` | `invoice_id`, `invoice_number`, `customer_id`, `open_date`, `due_date?`, `status`, `currency`, `items[]`, `notes?`, `bank_account_info?` | Replace line items and recalculate totals; records a status-history entry when the status changes. |
-| `change-invoice-status` | `invoice_id`, `status` | Transition status (`Draft`, `Sent`, `Received`, `Reject`); records history. |
-| `delete-invoice` | `invoice_id` | Delete an invoice. *(destructive)* |
-| `search-invoice-items` | `query` | Search previously-invoiced item names by keyword. *(readOnly)* |
-
-`status` ∈ `Draft | Sent | Received | Reject`. `currency` ∈ `USD | MMK`.
-
-Each `items[]` entry:
-
-```json
-{ "item_name": "Consulting", "description": "Optional", "qty": 2, "price": 50 }
-```
+| Tool name | What it does |
+|-----------|-------------|
+| `list-invoices` | List all your invoices. Can filter by status, date, customer. |
+| `create-invoice` | Create a new invoice with line items. |
+| `update-invoice` | Update an existing invoice. |
+| `change-invoice-status` | Change status: Draft → Sent → Received or Reject. |
+| `delete-invoice` | Delete an invoice. |
+| `search-invoice-items` | Search items you invoiced before. |
 
 #### Customers
 
-| Tool | Arguments | Description |
-| --- | --- | --- |
-| `list-customers` | — | List customers. *(readOnly)* |
-| `create-customer` | `name`, `email?`, `address?` | Create a customer. |
-| `update-customer` | `customer_id`, `name`, `email?`, `address?` | Update a customer. |
-| `delete-customer` | `customer_id` | Delete a customer (and its avatar). *(destructive)* |
+| Tool name | What it does |
+|-----------|-------------|
+| `list-customers` | List all customers. |
+| `create-customer` | Create a customer (name, email, address). |
+| `update-customer` | Update a customer. |
+| `delete-customer` | Delete a customer. |
 
-> Avatars are not exposed over MCP (binary upload). Use the web UI to manage avatars.
+#### Items (your product catalog)
 
-#### Items (catalog)
+| Tool name | What it does |
+|-----------|-------------|
+| `list-items` | List catalog items (paginated). |
+| `create-item` | Create an item (name, price, description). |
+| `update-item` | Update an item. |
+| `delete-item` | Delete an item. |
 
-| Tool | Arguments | Description |
-| --- | --- | --- |
-| `list-items` | `page?`, `per_page?` | Paginated list of catalog items. *(readOnly)* |
-| `create-item` | `name`, `price`, `description?` | Create an item. |
-| `update-item` | `item_id`, `name`, `price`, `description?` | Update an item. |
-| `delete-item` | `item_id` | Delete an item. *(destructive)* |
+### Resources (read-only data — the AI can read)
 
-### Resources
+| Resource | What it returns |
+|----------|----------------|
+| `invoice://invoices/{id}` | One invoice with all details, line items, customer info, status history. |
+| `customer://customers/{id}` | One customer with their invoice list. |
+| `item://items/{id}` | One catalog item. |
+| `pyaysar://dashboard` | Summary: customer count, invoice count, recent drafts. |
 
-Resources return read-only JSON context. The three entity resources are **URI templates**.
+### Prompts (templates for common AI tasks)
 
-| Resource | URI | Returns |
-| --- | --- | --- |
-| `InvoiceResource` | `invoice://invoices/{id}` | Invoice + line items + customer + status history |
-| `CustomerResource` | `customer://customers/{id}` | Customer + their invoices (id, number, status, total) |
-| `ItemResource` | `item://items/{id}` | Single catalog item |
-| `DashboardResource` | `pyaysar://dashboard` | Customer/invoice counts + 10 most recent draft invoices |
-
-Example — a client reads an invoice by requesting the URI `invoice://invoices/42`.
-
-### Prompts
-
-Prompts are reusable templates that yield a ready-to-use assistant message.
-
-| Prompt | Arguments | Description |
-| --- | --- | --- |
-| `overdue-invoice-reminder` | `invoice_id`, `tone?` | Builds a payment-reminder prompt for an invoice past its due date. `tone` examples: `friendly`, `firm`, `formal`. |
-| `receivables-summary` | — | Builds a prompt summarising outstanding receivables grouped by status. |
+| Prompt | What it does |
+|--------|-------------|
+| `overdue-invoice-reminder` | Writes a payment reminder email for an overdue invoice. |
+| `receivables-summary` | Summarizes all outstanding invoices grouped by status. |
 
 ---
 
-## Testing
+## How to check if it works
 
-MCP primitives are tested in `tests/Feature/Mcp/PyaysarServerTest.php` using the package's test helper, which bypasses the JSON-RPC handshake and calls the server directly:
-
-```php
-use App\Mcp\Servers\PyaysarServer;
-use App\Mcp\Tools\CreateItemTool;
-
-// Web-transport style: authenticate as a user
-PyaysarServer::actingAs($user)
-    ->tool(CreateItemTool::class, ['name' => 'Widget', 'price' => 9.99])
-    ->assertOk()
-    ->assertSee('Widget');
-
-// Resources take the URI template variables:
-PyaysarServer::actingAs($user)
-    ->resource(InvoiceResource::class, ['id' => $invoice->id])
-    ->assertOk();
-
-// Local-transport style: bind the user via config instead
-config(['mcp.local_user_id' => $user->id]);
-PyaysarServer::tool(CreateItemTool::class, ['name' => 'Local', 'price' => 5])
-    ->assertOk();
-```
-
-Available assertions: `assertOk()`, `assertSee($text)`, `assertDontSee($text)`, `assertStructuredContent(...)`, `assertHasErrors()`, `->dump()` / `->dd()`.
-
-Run the suite:
+### Test with the inspector tool
 
 ```bash
-composer run test                 # full suite
-./vendor/bin/pest tests/Feature/Mcp/PyaysarServerTest.php   # MCP only
-```
-
----
-
-## Extending
-
-1. **Add the logic to a service.** `app/Services/*Service.php` are the single source of truth. If the behaviour is new, add a method there.
-2. **Create the primitive.** `php artisan make:mcp-tool ListDeliveriesTool` (or `make:mcp-resource`, `make:mcp-prompt`).
-3. **Resolve the user** with `use App\Mcp\Concerns\ResolvesUser;` and call `$this->resolveUser($request)`. Scope all queries through that user.
-4. **Return type matters.** A tool that returns `Response::structured(...)` must declare `handle(): Response|ResponseFactory` and `use Laravel\Mcp\ResponseFactory;`. Tools returning only `Response::text()` / `Response::json()` may keep `: Response`.
-5. **Register it** in `app/Mcp/Servers/PyaysarServer.php` (`$tools`, `$resources`, or `$prompts`).
-6. **Test it** with the helper above, including a cross-user isolation case.
-
-### End-to-end debugging
-
-The MCP package ships an interactive inspector for exploring a server's primitives over a real transport:
-
-```bash
-# Against the web transport:
+# Test remote (HTTP) — make sure your app is running first
 npx @modelcontextprotocol/inspector
 
-# Or inspect the local server directly:
+# Test local (Artisan)
 php artisan mcp:start pyaysar
+```
+
+### Test with Claude Desktop
+
+1. Add the config above to `claude_desktop_config.json`
+2. Restart Claude Desktop
+3. Ask: "List my invoices" or "Show my dashboard"
+4. If it responds with your data, it works!
+
+---
+
+## Security notes
+
+- **Remote access** requires a Sanctum token. No token = no access.
+- **Local access** uses the user ID from `.env`. Only use this on your own machine.
+- The AI can only see **your data**. It cannot see other users' invoices or customers.
+- If something is wrong, the AI gets an error — it never sees data from other users.
+
+---
+
+## FAQ
+
+**Q: The AI says "connection refused" or "no response"**
+A: For remote — make sure `composer run dev` is running. For local — check that the path to `artisan` is correct in the config.
+
+**Q: The AI says "user not found" or "set MCP_LOCAL_USER_ID"**
+A: You are using local mode but forgot to set `MCP_LOCAL_USER_ID=1` in `.env`.
+
+**Q: Can I use this with my production server?**
+A: Yes, use the remote (HTTP) way. Create a token for each AI client that needs access.
+
+**Q: Can the AI upload files or avatars?**
+A: No. Avatars are binary files — use the web UI for that.
+
+---
+
+## Quick reference
+
+| What you want | Config to use |
+|--------------|---------------|
+| AI on same machine as your code | Local mode (`MCP_LOCAL_USER_ID` + artisan command) |
+| AI on different machine / cloud | Remote mode (HTTP URL + Sanctum token) |
+| Claude Desktop | `claude_desktop_config.json` |
+| Cursor | `.cursor/mcp.json` |
+| OpenCode | `opencode.json` |
+
+---
+
+## For developers: how to add new features
+
+1. Add logic to `app/Services/*Service.php` (e.g. `InvoiceService`)
+2. Create tool: `php artisan make:mcp-tool MyNewTool`
+3. In the tool, use `use App\Mcp\Concerns\ResolvesUser;` and call `$this->resolveUser($request)`
+4. Register it in `app/Mcp/Servers/PyaysarServer.php`
+5. Test it with `PyaysarServer::actingAs($user)->tool(MyNewTool::class, [...])`
+
+```bash
+# Run tests
+composer run test
+
+# Run only MCP tests
+./vendor/bin/pest tests/Feature/Mcp/PyaysarServerTest.php
 ```
