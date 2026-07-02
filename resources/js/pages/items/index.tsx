@@ -148,19 +148,18 @@ export default function Index({ items }: IndexProps) {
                 </div>
 
                 {items.links.length > 3 && (
-                    <div className="flex items-center justify-end space-x-2 py-4">
+                    <div className="flex items-center justify-end gap-1 py-4">
                         {items.links.map((link, key) => (
                             <div key={key}>
                                 {link.url === null ? (
                                     <span
-                                        className="text-muted-foreground px-3 py-1 text-sm border rounded opacity-50 cursor-not-allowed"
+                                        className="inline-flex items-center justify-center h-8 min-w-8 px-2 text-sm text-muted-foreground/50 cursor-not-allowed"
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ) : (
                                     <Link
                                         href={link.url}
-                                        className={`px-3 py-1 text-sm border rounded hover:bg-muted ${link.active ? 'bg-primary text-primary-foreground' : ''
-                                            }`}
+                                        className={`inline-flex items-center justify-center h-8 min-w-8 px-2 text-sm rounded-md transition-colors ${link.active ? 'bg-primary text-primary-foreground font-medium' : 'text-muted-foreground hover:bg-muted'}`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 )}

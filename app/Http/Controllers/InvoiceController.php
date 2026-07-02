@@ -111,6 +111,17 @@ class InvoiceController extends Controller
         return redirect()->route('invoices.show', $invoice)->with('success', 'Invoice updated successfully.');
     }
 
+    public function duplicate(Invoice $invoice)
+    {
+        if ($invoice->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $newInvoice = $this->invoices->duplicate($invoice);
+
+        return redirect()->route('invoices.show', $newInvoice)->with('success', 'Invoice duplicated successfully.');
+    }
+
     public function destroy(Invoice $invoice)
     {
         if ($invoice->user_id !== Auth::id()) {

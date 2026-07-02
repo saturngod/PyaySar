@@ -1,7 +1,12 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Item } from '@/types';
+interface Item {
+    id: number;
+    name: string;
+    description: string | null;
+    price: string;
+}
 
 interface ShowProps {
     item: Item;
@@ -24,16 +29,16 @@ export default function Show({ item }: ShowProps) {
 
                 <div className="rounded-xl bg-card p-6 border text-card-foreground shadow-sm max-w-2xl space-y-4">
                     <div>
-                        <h3 className="font-medium text-gray-500">Name</h3>
+                        <h3 className="font-medium text-muted-foreground">Name</h3>
                         <p>{item.name}</p>
                     </div>
                     <div>
-                        <h3 className="font-medium text-gray-500">Price</h3>
+                        <h3 className="font-medium text-muted-foreground">Price</h3>
                         <p>${Number(item.price).toFixed(2)}</p>
                     </div>
                     {item.description && (
                         <div>
-                            <h3 className="font-medium text-gray-500">Description</h3>
+                            <h3 className="font-medium text-muted-foreground">Description</h3>
                             <p className="whitespace-pre-wrap">{item.description}</p>
                         </div>
                     )}

@@ -139,7 +139,7 @@ function AutocompleteItemName({ value, onChange, onSelectItem, className, placeh
                 }}
             />
             {open && results.length > 0 && (
-                <div className="absolute top-full left-0 w-full mt-1 bg-white border rounded-md shadow-lg z-50 overflow-hidden animate-in fade-in-0 zoom-in-95">
+                <div className="absolute top-full left-0 w-full mt-1 bg-popover border border-border rounded-md shadow-lg z-50 overflow-hidden animate-in fade-in-0 zoom-in-95">
                     <Command shouldFilter={false}>
                         <CommandList>
                             <CommandGroup heading="Suggestions">
@@ -157,7 +157,7 @@ function AutocompleteItemName({ value, onChange, onSelectItem, className, placeh
                                         <Check className={cn("mr-2 h-4 w-4", value === item.name ? "opacity-100" : "opacity-0")} />
                                         <span>{item.name}</span>
                                         {typeof item.price === 'number' && (
-                                            <span className="ml-auto text-xs text-gray-400">
+                                            <span className="ml-auto text-xs text-muted-foreground">
                                                 {item.price.toFixed(2)}
                                             </span>
                                         )}
@@ -272,15 +272,15 @@ export default function InvoiceForm({
         : cn("max-w-4xl", className);
 
     return (
-        <form onSubmit={handleSubmit} className={cn("mx-auto rounded-xl bg-white p-8 shadow-sm border border-gray-200", containerClass)}>
+        <form onSubmit={handleSubmit} className={cn("mx-auto rounded-xl bg-card p-8 shadow-sm border border-border", containerClass)}>
             {/* Header: Invoice No, Issued, Due */}
-            <div className="mb-8 grid grid-cols-3 gap-8 border-b border-dashed border-gray-200 pb-8">
+            <div className="mb-8 grid grid-cols-3 gap-8 border-b border-dashed border-border pb-8">
                 <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase text-gray-400">
+                    <label className="mb-2 block text-xs font-semibold uppercase text-muted-foreground">
                         Invoice No
                     </label>
                     {readonly ? (
-                        <div className="text-xl font-bold text-gray-900">
+                        <div className="text-xl font-bold text-foreground">
                             {data.invoice_number || (invoice ? `INV-${invoice.id}` : '...')}
                         </div>
                     ) : (
@@ -288,7 +288,7 @@ export default function InvoiceForm({
                             <Input
                                 value={data.invoice_number}
                                 onChange={(e) => setData('invoice_number', e.target.value)}
-                                className="text-xl font-bold text-gray-900 border-none p-0 shadow-none focus-visible:ring-0 h-auto rounded-none"
+                                className="text-xl font-bold text-foreground border-none p-0 shadow-none focus-visible:ring-0 h-auto rounded-none"
                                 placeholder="INV-..."
                             />
                             {errors.invoice_number && <p className="text-sm text-red-500">{errors.invoice_number}</p>}
@@ -298,10 +298,10 @@ export default function InvoiceForm({
                 <div className="col-span-2"> {/* This div now spans two columns */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className={cn("space-y-1", !data.due_date && readonly && "print:col-start-2 print:text-right")}>
-                            <Label className="text-xs text-gray-500">Issued</Label>
+                            <Label className="text-xs text-muted-foreground">Issued</Label>
                             {readonly ? (
-                                <div className={cn("flex h-8 w-full items-center px-2 -ml-2 text-sm text-gray-900", !data.due_date && readonly && "print:justify-end print:px-0 print:ml-0")}>
-                                    <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
+                                <div className={cn("flex h-8 w-full items-center px-2 -ml-2 text-sm text-foreground", !data.due_date && readonly && "print:justify-end print:px-0 print:ml-0")}>
+                                    <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
                                     {data.open_date ? format(data.open_date, "PPP") : '-'}
                                 </div>
                             ) : (
@@ -310,7 +310,7 @@ export default function InvoiceForm({
                                         <Button
                                             variant="outline"
                                             className={cn(
-                                                "w-full justify-start text-left font-normal border-none shadow-none h-8 px-2 -ml-2 hover:bg-gray-50",
+                                                "w-full justify-start text-left font-normal border-none shadow-none h-8 px-2 -ml-2 hover:bg-muted/50",
                                                 !data.open_date && "text-muted-foreground"
                                             )}
                                         >
@@ -332,10 +332,10 @@ export default function InvoiceForm({
                         </div>
                         {(data.due_date || !readonly) && (
                             <div className="space-y-1">
-                                <Label className="text-xs text-gray-500">Due</Label>
+                                <Label className="text-xs text-muted-foreground">Due</Label>
                                 {readonly ? (
-                                    <div className="flex h-8 w-full items-center px-2 -ml-2 text-sm text-gray-900">
-                                        <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
+                                    <div className="flex h-8 w-full items-center px-2 -ml-2 text-sm text-foreground">
+                                        <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
                                         {data.due_date ? format(data.due_date, "PPP") : '-'}
                                     </div>
                                 ) : (
@@ -345,7 +345,7 @@ export default function InvoiceForm({
                                                 <Button
                                                     variant="outline"
                                                     className={cn(
-                                                        "w-full justify-start text-left font-normal border-none shadow-none h-8 px-2 -ml-2 hover:bg-gray-50",
+                                                        "w-full justify-start text-left font-normal border-none shadow-none h-8 px-2 -ml-2 hover:bg-muted/50",
                                                         !data.due_date && "text-muted-foreground"
                                                     )}
                                                 >
@@ -367,7 +367,7 @@ export default function InvoiceForm({
                                                 type="button"
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-8 w-8 shrink-0 text-gray-400 hover:text-red-500"
+                                                className="h-8 w-8 shrink-0 text-muted-foreground hover:text-red-500"
                                                 onClick={() => setData('due_date', undefined)}
                                                 title="Clear due date"
                                             >
@@ -380,9 +380,9 @@ export default function InvoiceForm({
                             </div>
                         )}
                         <div className="space-y-1 no-print">
-                            <Label className="text-xs text-gray-500">Currency</Label>
+                            <Label className="text-xs text-muted-foreground">Currency</Label>
                             {readonly ? (
-                                <div className="flex h-8 w-full items-center px-2 -ml-2 text-sm text-gray-900">
+                                <div className="flex h-8 w-full items-center px-2 -ml-2 text-sm text-foreground">
                                     {data.currency === 'MMK' ? 'MMK (Myanmar Kyat)' : 'USD (US Dollar)'}
                                 </div>
                             ) : (
@@ -391,7 +391,7 @@ export default function InvoiceForm({
                                     value={data.currency}
                                     onValueChange={(value) => setData('currency', value)}
                                 >
-                                    <SelectTrigger className="w-full border-none shadow-none h-8 px-2 -ml-2 bg-transparent hover:bg-gray-50 focus:ring-0">
+                                    <SelectTrigger className="w-full border-none shadow-none h-8 px-2 -ml-2 bg-transparent hover:bg-muted/50 focus:ring-0">
                                         <SelectValue placeholder="Select Currency" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -402,9 +402,9 @@ export default function InvoiceForm({
                             )}
                         </div>
                         <div className="space-y-1 no-print">
-                            <Label className="text-xs text-gray-500">Status</Label>
+                            <Label className="text-xs text-muted-foreground">Status</Label>
                             {readonly ? (
-                                <div className="flex h-8 w-full items-center px-2 -ml-2 text-sm text-gray-900">
+                                <div className="flex h-8 w-full items-center px-2 -ml-2 text-sm text-foreground">
                                     {data.status}
                                 </div>
                             ) : (
@@ -412,7 +412,7 @@ export default function InvoiceForm({
                                     value={data.status}
                                     onValueChange={(value) => setData('status', value)}
                                 >
-                                    <SelectTrigger className="w-full border-none shadow-none h-8 px-2 -ml-2 bg-transparent hover:bg-gray-50 focus:ring-0">
+                                    <SelectTrigger className="w-full border-none shadow-none h-8 px-2 -ml-2 bg-transparent hover:bg-muted/50 focus:ring-0">
                                         <SelectValue placeholder="Select Status" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -429,33 +429,33 @@ export default function InvoiceForm({
             </div>
 
             {/* From / To Section */}
-            <div className="mb-12 grid grid-cols-2 gap-12 border-b border-dashed border-gray-200 pb-12">
+            <div className="mb-12 grid grid-cols-2 gap-12 border-b border-dashed border-border pb-12">
                 {/* From Section */}
                 <div>
-                    <label className="mb-6 block text-xs font-semibold uppercase text-gray-400">
+                    <label className="mb-6 block text-xs font-semibold uppercase text-muted-foreground">
                         From
                     </label>
                     {/* Placeholder Avatar or Logo */}
-                    {!readonly && !userPreference?.company_logo && <div className="mb-4 h-12 w-12 rounded-full bg-gray-100" />}
+                    {!readonly && !userPreference?.company_logo && <div className="mb-4 h-12 w-12 rounded-full bg-muted" />}
 
                     {userPreference?.company_logo && (
                         <div className="mb-4">
                             <img
                                 src={`/storage/${userPreference.company_logo}`}
                                 alt="Company Logo"
-                                className="h-16 w-16 object-cover rounded-full border border-gray-100"
+                                className="h-16 w-16 object-cover rounded-full border border-border/50"
                             />
                         </div>
                     )}
 
                     <div className="space-y-1">
-                        <div className="text-xl font-bold text-gray-900">
+                        <div className="text-xl font-bold text-foreground">
                             {userPreference?.company_name}
                         </div>
-                        <div className="text-gray-500">
+                        <div className="text-muted-foreground">
                             {userPreference?.company_email}
                         </div>
-                        <div className="mt-4 text-sm text-gray-400 whitespace-pre-wrap">
+                        <div className="mt-4 text-sm text-muted-foreground whitespace-pre-wrap">
                             {userPreference?.company_address}
                         </div>
                     </div>
@@ -463,7 +463,7 @@ export default function InvoiceForm({
 
                 {/* To Section */}
                 <div>
-                    <label className="mb-6 block text-xs font-semibold uppercase text-gray-400">
+                    <label className="mb-6 block text-xs font-semibold uppercase text-muted-foreground">
                         To
                     </label>
 
@@ -476,9 +476,9 @@ export default function InvoiceForm({
                                     role="combobox"
                                     aria-expanded={customerOpen}
                                     className={cn(
-                                        "mb-4 h-12 w-12 rounded-full bg-gray-100 p-0 hover:bg-gray-200",
-                                        !selectedCustomer && "border border-dashed border-gray-300",
-                                        readonly && "cursor-default hover:bg-gray-100"
+                                        "mb-4 h-12 w-12 rounded-full bg-muted p-0 hover:bg-muted",
+                                        !selectedCustomer && "border border-dashed border-border",
+                                        readonly && "cursor-default hover:bg-muted"
                                     )}
                                 >
                                     {selectedCustomer ? (
@@ -489,10 +489,10 @@ export default function InvoiceForm({
                                                 className="h-full w-full rounded-full object-cover"
                                             />
                                         ) : (
-                                            <div className="h-full w-full rounded-full bg-gray-200" />
+                                            <div className="h-full w-full rounded-full bg-muted" />
                                         )
                                     ) : (
-                                        <Plus className="h-5 w-5 text-gray-400" />
+                                        <Plus className="h-5 w-5 text-muted-foreground" />
                                     )}
                                 </Button>
                             </PopoverTrigger>
@@ -535,32 +535,32 @@ export default function InvoiceForm({
                                 <img
                                     src={`/storage/${selectedCustomer.avatar}`}
                                     alt="Customer Avatar"
-                                    className="h-16 w-16 object-cover rounded-full border border-gray-100"
+                                    className="h-16 w-16 object-cover rounded-full border border-border/50"
                                 />
                             ) : (
-                                <div className="h-12 w-12 rounded-full bg-gray-100" />
+                                <div className="h-12 w-12 rounded-full bg-muted" />
                             )}
                         </div>
                     )}
 
                     {selectedCustomer ? (
                         <div className="space-y-1">
-                            <div className="text-xl font-bold text-gray-900">{selectedCustomer.name}</div>
-                            <div className="text-gray-500">{selectedCustomer.email}</div>
-                            <div className="mt-4 whitespace-pre-wrap text-sm text-gray-400">
+                            <div className="text-xl font-bold text-foreground">{selectedCustomer.name}</div>
+                            <div className="text-muted-foreground">{selectedCustomer.email}</div>
+                            <div className="mt-4 whitespace-pre-wrap text-sm text-muted-foreground">
                                 {selectedCustomer.address}
                             </div>
                         </div>
                     ) : (
-                        <div className="text-gray-400 italic">Select a customer...</div>
+                        <div className="text-muted-foreground italic">Select a customer...</div>
                     )}
                 </div>
             </div>
 
             {/* Line Items */}
-            <div className="mb-8 border-b border-dashed border-gray-200 pb-8">
+            <div className="mb-8 border-b border-dashed border-border pb-8">
                 {/* Table Header */}
-                <div className="mb-4 grid grid-cols-12 gap-4 text-xs font-semibold uppercase text-gray-400">
+                <div className="mb-4 grid grid-cols-12 gap-4 text-xs font-semibold uppercase text-muted-foreground">
                     <div className="col-span-6">Description</div>
                     <div className="col-span-2 text-right">Qty</div>
                     <div className="col-span-2 text-right">Price</div>
@@ -573,7 +573,7 @@ export default function InvoiceForm({
                             {readonly ? (
                                 <>
                                     <div className="flex h-9 items-center text-base font-medium">{item.item_name}</div>
-                                    {item.description && <div className="text-sm text-gray-500 whitespace-pre-wrap">{item.description}</div>}
+                                    {item.description && <div className="text-sm text-muted-foreground whitespace-pre-wrap">{item.description}</div>}
                                 </>
                             ) : (
                                 <>
@@ -599,7 +599,7 @@ export default function InvoiceForm({
                                     <Textarea
                                         value={item.description || ''}
                                         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateItem(index, 'description', e.target.value)}
-                                        className="min-h-[20px] resize-none border-none p-0 text-sm text-gray-500 shadow-none focus-visible:ring-0"
+                                        className="min-h-[20px] resize-none border-none p-0 text-sm text-muted-foreground shadow-none focus-visible:ring-0"
                                         placeholder="Description (optional)"
                                         rows={1}
                                     />
@@ -641,7 +641,7 @@ export default function InvoiceForm({
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => removeItem(index)}
-                                    className="h-6 w-6 text-gray-300 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
+                                    className="h-6 w-6 text-muted-foreground/60 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
                                 >
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
@@ -655,7 +655,7 @@ export default function InvoiceForm({
                         type="button"
                         variant="ghost"
                         onClick={addItem}
-                        className="mt-2 h-auto p-0 font-medium text-blue-600 hover:bg-transparent hover:text-blue-700"
+                        className="mt-2 h-auto p-0 font-medium text-primary hover:bg-transparent hover:text-primary/80"
                     >
                         <Plus className="mr-2 h-4 w-4" /> Add Item
                     </Button>
@@ -668,18 +668,18 @@ export default function InvoiceForm({
                 <div className="w-1/2 space-y-8">
                     {(data.notes || !readonly) && (
                         <div>
-                            <label className="mb-2 block text-xs font-semibold uppercase text-gray-400">
+                            <label className="mb-2 block text-xs font-semibold uppercase text-muted-foreground">
                                 Note
                             </label>
                             {readonly ? (
-                                <div className="text-sm text-gray-500 whitespace-pre-wrap">
+                                <div className="text-sm text-muted-foreground whitespace-pre-wrap">
                                     {data.notes}
                                 </div>
                             ) : (
                                 <Textarea
                                     value={data.notes}
                                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('notes', e.target.value)}
-                                    className="bg-transparent border border-gray-200 rounded-md p-3 text-gray-500 focus-visible:ring-0"
+                                    className="bg-transparent border border-border rounded-md p-3 text-muted-foreground focus-visible:ring-0"
                                     placeholder="Add a note..."
                                 />
                             )}
@@ -688,18 +688,18 @@ export default function InvoiceForm({
 
                     {(data.bank_account_info || !readonly) && (
                         <div>
-                            <label className="mb-2 block text-xs font-semibold uppercase text-gray-400">
+                            <label className="mb-2 block text-xs font-semibold uppercase text-muted-foreground">
                                 Bank Details
                             </label>
                             {readonly ? (
-                                <div className="text-sm text-gray-500 whitespace-pre-wrap">
+                                <div className="text-sm text-muted-foreground whitespace-pre-wrap">
                                     {data.bank_account_info}
                                 </div>
                             ) : (
                                 <Textarea
                                     value={data.bank_account_info}
                                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('bank_account_info', e.target.value)}
-                                    className="bg-transparent border border-gray-200 rounded-md p-3 text-gray-500 focus-visible:ring-0 h-24"
+                                    className="bg-transparent border border-border rounded-md p-3 text-muted-foreground focus-visible:ring-0 h-24"
                                     placeholder="Bank Name&#10;Account Number&#10;Swift Code"
                                 />
                             )}
@@ -709,14 +709,14 @@ export default function InvoiceForm({
 
                 <div className="w-1/3 space-y-4">
                     <div className="flex justify-between text-sm">
-                        <span className="font-medium text-gray-500">Subtotal</span>
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-muted-foreground">Subtotal</span>
+                        <span className="font-medium text-foreground">
                             {data.currency} {subTotal.toFixed(2)}
                         </span>
                     </div>
-                    <div className="border-t border-dashed border-gray-200 pt-4 flex justify-between items-center">
-                        <span className="font-semibold text-gray-900">Total Amount</span>
-                        <span className="font-bold text-gray-900">
+                    <div className="border-t border-dashed border-border pt-4 flex justify-between items-center">
+                        <span className="font-semibold text-foreground">Total Amount</span>
+                        <span className="font-bold text-foreground">
                             {data.currency} {total.toFixed(2)}
                         </span>
                     </div>

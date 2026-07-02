@@ -116,10 +116,10 @@ export function CustomerFormDialog({
                             <img
                                 src={newAvatarPreview || `/storage/${customer?.avatar}`}
                                 alt="Avatar Preview"
-                                className="h-24 w-24 rounded-full object-cover border border-gray-200"
+                                className="h-24 w-24 rounded-full object-cover border border-border"
                             />
                         ) : (
-                            <div className="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                            <div className="h-24 w-24 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
                                 No Image
                             </div>
                         )}

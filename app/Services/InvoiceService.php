@@ -141,6 +141,40 @@ class InvoiceService
         return $invoice->fresh(['statusHistories']);
     }
 
+    public function duplicate(Invoice $invoice): Invoice
+    {
+        $invoice->load('items');
+
+        return DB::transaction(function () use ($invoice) {
+            $nextId = (Invoice::max('id') ?? 0) + 1;
+
+            $newInvoice = $invoice->user()->first()->invoices()->create([
+                'invoice_number' => 'INV-'.$nextId,
+                'customer_id' => $invoice->customer_id,
+                'open_date' => now(),
+                'due_date' => null,
+                'status' => 'Draft',
+                'currency' => $invoice->currency,
+                'notes' => $invoice->notes,
+                'bank_account_info' => $invoice->bank_account_info,
+                'sub_total' => $invoice->sub_total,
+                'total' => $invoice->total,
+            ]);
+
+            foreach ($invoice->items as $item) {
+                $newInvoice->items()->create([
+                    'item_name' => $item->item_name,
+                    'description' => $item->description,
+                    'qty' => $item->qty,
+                    'price' => $item->price,
+                    'total_price' => $item->total_price,
+                ]);
+            }
+
+            return $newInvoice;
+        });
+    }
+
     public function delete(Invoice $invoice): void
     {
         $invoice->delete();

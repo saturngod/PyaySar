@@ -22,7 +22,7 @@ export default function Show({ invoice, customers, userPreference }: ShowProps) 
 
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between mb-4">
-                    <Link href="/invoices" className="flex items-center text-gray-500 hover:text-gray-700">
+                    <Link href="/invoices" className="flex items-center text-muted-foreground hover:text-foreground transition-colors">
                         <ChevronLeft className="mr-1 h-4 w-4" />
                         Back to Invoices
                     </Link>

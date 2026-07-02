@@ -64,13 +64,13 @@ interface IndexProps {
 const getStatusColor = (status: string) => {
     switch (status) {
         case 'Received':
-            return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-green-200';
+            return 'bg-[#0ecb81]/15 text-[#0ecb81] border-[#0ecb81]/20';
         case 'Sent':
-            return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200';
+            return 'bg-blue-500/15 text-blue-500 border-blue-500/20';
         case 'Reject':
-            return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200';
+            return 'bg-[#f6465d]/15 text-[#f6465d] border-[#f6465d]/20';
         default:
-            return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400 border-gray-200';
+            return 'bg-muted text-muted-foreground border-border';
     }
 };
 
@@ -200,6 +200,13 @@ export default function Index({ invoices, filters, customers }: IndexProps) {
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
                                                         <Link href={`/invoices/${invoice.id}/edit`}>Edit</Link>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        className="cursor-pointer"
+                                                        onClick={() => router.post(`/invoices/${invoice.id}/duplicate`)}
+                                                    >
+                                                        Duplicate
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
                                                         className="text-red-600 focus:text-red-600 cursor-pointer"
