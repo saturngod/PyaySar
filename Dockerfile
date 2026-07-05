@@ -5,13 +5,14 @@ RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libjpeg-dev libfreetype6-dev \
     libonig-dev libxml2-dev libzip-dev libicu-dev \
     libssl-dev libcurl4-openssl-dev libbrotli-dev \
+    libpq-dev \
     supervisor \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
-    pdo_mysql mbstring exif pcntl bcmath gd zip intl opcache
+    pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip intl opcache
 
 # Install Swoole (required for Octane)
 RUN pecl install swoole \
