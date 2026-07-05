@@ -31,6 +31,8 @@ const fetchImageAsDataUrl = async (url: string): Promise<string | null> => {
         if (!response.ok) return null;
 
         const blob = await response.blob();
+        if (!blob.type.startsWith('image/')) return null;
+
         return new Promise((resolve) => {
             const reader = new FileReader();
             reader.onloadend = () => resolve(reader.result as string);
@@ -131,10 +133,10 @@ const styles = StyleSheet.create({
         lineHeight: 1.4,
     },
     logo: {
-        width: 50,
         height: 50,
         marginBottom: 10,
-        borderRadius: 25,
+        objectFit: 'contain',
+        alignSelf: 'flex-start',
     },
     itemsHeader: {
         flexDirection: 'row',

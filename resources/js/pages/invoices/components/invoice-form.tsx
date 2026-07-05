@@ -454,7 +454,7 @@ export default function InvoiceForm({
                             <img
                                 src={userPreference.company_logo_url}
                                 alt="Company Logo"
-                                className="h-16 w-16 object-cover rounded-full border border-border/50"
+                                className="h-16 object-cover border border-border/50"
                             />
                         </div>
                     )}
@@ -546,7 +546,7 @@ export default function InvoiceForm({
                                 <img
                                     src={selectedCustomer.avatar_url}
                                     alt="Customer Avatar"
-                                    className="h-16 w-16 object-cover rounded-full border border-border/50"
+                                    className="h-16 object-cover border border-border/50"
                                 />
                             ) : (
                                 <div className="h-12 w-12 rounded-full bg-muted" />

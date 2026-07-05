@@ -82,7 +82,7 @@ index.form = indexForm
 
 /**
 * @see \App\Http\Controllers\Settings\ApiTokenController::store
-* @see app/Http/Controllers/Settings/ApiTokenController.php:27
+* @see app/Http/Controllers/Settings/ApiTokenController.php:29
 * @route '/settings/api-tokens'
 */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -97,7 +97,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Settings\ApiTokenController::store
-* @see app/Http/Controllers/Settings/ApiTokenController.php:27
+* @see app/Http/Controllers/Settings/ApiTokenController.php:29
 * @route '/settings/api-tokens'
 */
 store.url = (options?: RouteQueryOptions) => {
@@ -106,7 +106,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Settings\ApiTokenController::store
-* @see app/Http/Controllers/Settings/ApiTokenController.php:27
+* @see app/Http/Controllers/Settings/ApiTokenController.php:29
 * @route '/settings/api-tokens'
 */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -116,7 +116,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
 /**
 * @see \App\Http\Controllers\Settings\ApiTokenController::store
-* @see app/Http/Controllers/Settings/ApiTokenController.php:27
+* @see app/Http/Controllers/Settings/ApiTokenController.php:29
 * @route '/settings/api-tokens'
 */
 const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -126,7 +126,7 @@ const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => 
 
 /**
 * @see \App\Http\Controllers\Settings\ApiTokenController::store
-* @see app/Http/Controllers/Settings/ApiTokenController.php:27
+* @see app/Http/Controllers/Settings/ApiTokenController.php:29
 * @route '/settings/api-tokens'
 */
 storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -138,7 +138,7 @@ store.form = storeForm
 
 /**
 * @see \App\Http\Controllers\Settings\ApiTokenController::destroy
-* @see app/Http/Controllers/Settings/ApiTokenController.php:38
+* @see app/Http/Controllers/Settings/ApiTokenController.php:40
 * @route '/settings/api-tokens/{token}'
 */
 export const destroy = (args: { token: string | number } | [token: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -153,7 +153,7 @@ destroy.definition = {
 
 /**
 * @see \App\Http\Controllers\Settings\ApiTokenController::destroy
-* @see app/Http/Controllers/Settings/ApiTokenController.php:38
+* @see app/Http/Controllers/Settings/ApiTokenController.php:40
 * @route '/settings/api-tokens/{token}'
 */
 destroy.url = (args: { token: string | number } | [token: string | number ] | string | number, options?: RouteQueryOptions) => {
@@ -180,7 +180,7 @@ destroy.url = (args: { token: string | number } | [token: string | number ] | st
 
 /**
 * @see \App\Http\Controllers\Settings\ApiTokenController::destroy
-* @see app/Http/Controllers/Settings/ApiTokenController.php:38
+* @see app/Http/Controllers/Settings/ApiTokenController.php:40
 * @route '/settings/api-tokens/{token}'
 */
 destroy.delete = (args: { token: string | number } | [token: string | number ] | string | number, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -190,7 +190,7 @@ destroy.delete = (args: { token: string | number } | [token: string | number ] |
 
 /**
 * @see \App\Http\Controllers\Settings\ApiTokenController::destroy
-* @see app/Http/Controllers/Settings/ApiTokenController.php:38
+* @see app/Http/Controllers/Settings/ApiTokenController.php:40
 * @route '/settings/api-tokens/{token}'
 */
 const destroyForm = (args: { token: string | number } | [token: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -205,7 +205,7 @@ const destroyForm = (args: { token: string | number } | [token: string | number 
 
 /**
 * @see \App\Http\Controllers\Settings\ApiTokenController::destroy
-* @see app/Http/Controllers/Settings/ApiTokenController.php:38
+* @see app/Http/Controllers/Settings/ApiTokenController.php:40
 * @route '/settings/api-tokens/{token}'
 */
 destroyForm.delete = (args: { token: string | number } | [token: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
