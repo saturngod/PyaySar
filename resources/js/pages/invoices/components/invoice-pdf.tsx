@@ -173,6 +173,7 @@ interface InvoicePdfProps {
         company_email?: string;
         company_address?: string;
         company_logo?: string;
+        company_logo_url?: string;
     } | null;
 }
 
@@ -213,10 +214,10 @@ const InvoicePdfDocument = ({ invoice, userPreference }: InvoicePdfProps) => {
                 <View style={styles.parties}>
                     <View style={styles.partySection}>
                         <Text style={styles.label}>From</Text>
-                        {userPreference?.company_logo && (
+                        {userPreference?.company_logo_url && (
                             <Image
                                 style={styles.logo}
-                                src={`/storage/${userPreference.company_logo}`}
+                                src={userPreference.company_logo_url}
                             />
                         )}
                         <Text style={styles.partyName}>{userPreference?.company_name || ''}</Text>

@@ -36,6 +36,7 @@ export interface Customer {
     email: string;
     address: string;
     avatar?: string;
+    avatar_url?: string;
 }
 
 export interface InvoiceItem {
@@ -66,6 +67,7 @@ export interface UserPreference {
     company_email?: string;
     company_address?: string;
     company_logo?: string;
+    company_logo_url?: string;
 }
 
 interface InvoiceFormProps {
@@ -436,12 +438,12 @@ export default function InvoiceForm({
                         From
                     </label>
                     {/* Placeholder Avatar or Logo */}
-                    {!readonly && !userPreference?.company_logo && <div className="mb-4 h-12 w-12 rounded-full bg-muted" />}
+                    {!readonly && !userPreference?.company_logo_url && <div className="mb-4 h-12 w-12 rounded-full bg-muted" />}
 
-                    {userPreference?.company_logo && (
+                    {userPreference?.company_logo_url && (
                         <div className="mb-4">
                             <img
-                                src={`/storage/${userPreference.company_logo}`}
+                                src={userPreference.company_logo_url}
                                 alt="Company Logo"
                                 className="h-16 w-16 object-cover rounded-full border border-border/50"
                             />
@@ -482,9 +484,9 @@ export default function InvoiceForm({
                                     )}
                                 >
                                     {selectedCustomer ? (
-                                        selectedCustomer.avatar ? (
+                                        selectedCustomer.avatar_url ? (
                                             <img
-                                                src={`/storage/${selectedCustomer.avatar}`}
+                                                src={selectedCustomer.avatar_url}
                                                 alt="Customer Avatar"
                                                 className="h-full w-full rounded-full object-cover"
                                             />
@@ -531,9 +533,9 @@ export default function InvoiceForm({
                     {/* Readonly Avatar Display */}
                     {readonly && selectedCustomer && (
                         <div className="mb-4">
-                            {selectedCustomer.avatar ? (
+                            {selectedCustomer.avatar_url ? (
                                 <img
-                                    src={`/storage/${selectedCustomer.avatar}`}
+                                    src={selectedCustomer.avatar_url}
                                     alt="Customer Avatar"
                                     className="h-16 w-16 object-cover rounded-full border border-border/50"
                                 />

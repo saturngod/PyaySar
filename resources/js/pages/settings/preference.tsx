@@ -23,6 +23,7 @@ interface UserPreference {
     company_email: string;
     company_address: string;
     company_logo: string | null;
+    company_logo_url: string | null;
 }
 
 export default function Preference({ preference }: { preference: UserPreference }) {
@@ -95,10 +96,10 @@ export default function Preference({ preference }: { preference: UserPreference 
 
                         <div className="grid gap-2">
                             <Label htmlFor="company_logo">Company Logo</Label>
-                            {preference?.company_logo && (
+                            {preference?.company_logo_url && (
                                 <div className="mb-2">
                                     <img
-                                        src={`/storage/${preference.company_logo}`}
+                                        src={preference.company_logo_url}
                                         alt="Current Logo"
                                         className="h-16 w-16 object-cover rounded-full border"
                                     />

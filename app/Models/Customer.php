@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Customer extends Model
 {
@@ -20,6 +21,8 @@ class Customer extends Model
         'user_id',
     ];
 
+    protected $appends = ['avatar_url'];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -28,5 +31,14 @@ class Customer extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (! $this->avatar) {
+            return null;
+        }
+
+        return Storage::url($this->avatar);
     }
 }

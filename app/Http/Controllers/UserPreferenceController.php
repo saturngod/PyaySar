@@ -34,9 +34,9 @@ class UserPreferenceController extends Controller
         if ($request->hasFile('company_logo')) {
             // Delete old logo if exists
             if ($preference->company_logo) {
-                Storage::disk('public')->delete($preference->company_logo);
+                Storage::delete($preference->company_logo);
             }
-            $path = $request->file('company_logo')->store('logos', 'public');
+            $path = $request->file('company_logo')->store('logos');
             $data['company_logo'] = $path;
         }
 

@@ -19,6 +19,7 @@ interface Customer {
     email: string;
     address: string;
     avatar?: string;
+    avatar_url?: string;
 }
 
 interface CustomerFormDialogProps {
@@ -103,9 +104,9 @@ export function CustomerFormDialog({
 
                     {/* Avatar Upload */}
                     <div className="flex flex-col items-center gap-4">
-                        {(newAvatarPreview || customer?.avatar) ? (
+                        {(newAvatarPreview || customer?.avatar_url) ? (
                             <img
-                                src={newAvatarPreview || `/storage/${customer?.avatar}`}
+                                src={newAvatarPreview || customer?.avatar_url}
                                 alt="Avatar Preview"
                                 className="h-24 w-24 rounded-full object-cover border border-border"
                             />

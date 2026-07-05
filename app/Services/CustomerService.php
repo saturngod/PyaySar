@@ -26,7 +26,7 @@ class CustomerService
     public function create(User $user, array $data, ?UploadedFile $avatar = null): Customer
     {
         if ($avatar) {
-            $data['avatar'] = $avatar->store('avatars', 'public');
+            $data['avatar'] = $avatar->store('avatars');
         }
 
         return $user->customers()->create($data);
@@ -39,10 +39,10 @@ class CustomerService
     {
         if ($avatar) {
             if ($customer->avatar) {
-                Storage::disk('public')->delete($customer->avatar);
+                Storage::delete($customer->avatar);
             }
 
-            $data['avatar'] = $avatar->store('avatars', 'public');
+            $data['avatar'] = $avatar->store('avatars');
         }
 
         $customer->update($data);
@@ -53,7 +53,7 @@ class CustomerService
     public function delete(Customer $customer): void
     {
         if ($customer->avatar) {
-            Storage::disk('public')->delete($customer->avatar);
+            Storage::delete($customer->avatar);
         }
 
         $customer->delete();

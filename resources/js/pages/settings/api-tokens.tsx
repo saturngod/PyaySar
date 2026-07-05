@@ -17,9 +17,10 @@ interface Token {
 interface Props {
     tokens: Token[];
     new_token?: string;
+    app_url: string;
 }
 
-export default function ApiTokens({ tokens, new_token }: Props) {
+export default function ApiTokens({ tokens, new_token, app_url }: Props) {
     const [tokenName, setTokenName] = useState('');
     const [creating, setCreating] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -141,7 +142,7 @@ export default function ApiTokens({ tokens, new_token }: Props) {
 {`{
   "mcpServers": {
     "pyaysar": {
-      "url": "https://your-domain.com/mcp",
+      "url": "${app_url}/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_TOKEN"
       }
