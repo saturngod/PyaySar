@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 
 class Customer extends Model
 {
@@ -37,6 +38,12 @@ class Customer extends Model
     {
         if (! $this->avatar) {
             return null;
+        }
+
+        $disk = Storage::disk();
+
+        if ($disk->getAdapter() instanceof AwsS3V3Adapter) {
+            return $disk->temporaryUrl($this->avatar, now()->addMinutes(30));
         }
 
         return Storage::url($this->avatar);
