@@ -2,6 +2,46 @@ import { Document, Font, Image, Page, pdf, StyleSheet, Text, View } from '@react
 import { format } from 'date-fns';
 import { Invoice } from './invoice-form';
 
+const getAbsoluteUrl = (url?: string | null): string => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    return `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
+/**
+ * Fetch an image URL using the browser's fetch and convert it to a base64
+ * data URL that @react-pdf/renderer can embed directly.
+ *
+ * - Same-origin URLs (local disk served behind auth): fetched with
+ *   `credentials: 'include'` so the session cookie is sent.
+ * - Cross-origin URLs (S3 signed URLs): fetched without credentials since
+ *   the signature in the query string already provides authentication, and
+ *   sending credentials would trigger stricter CORS requirements.
+ */
+const fetchImageAsDataUrl = async (url: string): Promise<string | null> => {
+    try {
+        const absoluteUrl = getAbsoluteUrl(url);
+        if (!absoluteUrl) return null;
+
+        const isSameOrigin = absoluteUrl.startsWith(window.location.origin);
+
+        const response = await fetch(absoluteUrl, {
+            credentials: isSameOrigin ? 'include' : 'omit',
+        });
+        if (!response.ok) return null;
+
+        const blob = await response.blob();
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+        });
+    } catch {
+        return null;
+    }
+};
+
 // Register MyanmarSagar for Unicode support
 Font.register({
     family: 'MyanmarSagar',
@@ -12,12 +52,6 @@ Font.register({
         }
     ],
 });
-
-const getAbsoluteUrl = (url?: string | null): string => {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    return `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
-};
 
 const formatAmount = (amount: number | string): string => {
     const num = Number(amount);
@@ -189,9 +223,13 @@ interface InvoicePdfProps {
         company_logo?: string;
         company_logo_url?: string;
     } | null;
+    /** Pre-resolved base64 data URL for the company logo */
+    resolvedLogoDataUrl?: string | null;
+    /** Pre-resolved base64 data URL for the customer avatar */
+    resolvedAvatarDataUrl?: string | null;
 }
 
-const InvoicePdfDocument = ({ invoice, userPreference }: InvoicePdfProps) => {
+const InvoicePdfDocument = ({ invoice, userPreference, resolvedLogoDataUrl, resolvedAvatarDataUrl }: InvoicePdfProps) => {
     const customer = invoice.customer;
     const items = invoice.items || [];
     const subTotal = items.reduce((acc, item) => acc + (Number(item.qty) * Number(item.price)), 0);
@@ -228,10 +266,10 @@ const InvoicePdfDocument = ({ invoice, userPreference }: InvoicePdfProps) => {
                 <View style={styles.parties}>
                     <View style={styles.partySection}>
                         <Text style={styles.label}>From</Text>
-                        {userPreference?.company_logo_url && (
+                        {resolvedLogoDataUrl && (
                             <Image
                                 style={styles.logo}
-                                src={getAbsoluteUrl(userPreference.company_logo_url)}
+                                src={resolvedLogoDataUrl}
                             />
                         )}
                         <Text style={styles.partyName}>{userPreference?.company_name || ''}</Text>
@@ -240,10 +278,10 @@ const InvoicePdfDocument = ({ invoice, userPreference }: InvoicePdfProps) => {
                     </View>
                     <View style={styles.partySection}>
                         <Text style={styles.label}>To</Text>
-                        {customer?.avatar_url && (
+                        {resolvedAvatarDataUrl && (
                             <Image
                                 style={styles.logo}
-                                src={getAbsoluteUrl(customer.avatar_url)}
+                                src={resolvedAvatarDataUrl}
                             />
                         )}
                         <Text style={styles.partyName}>{customer?.name || ''}</Text>
@@ -314,7 +352,25 @@ const InvoicePdfDocument = ({ invoice, userPreference }: InvoicePdfProps) => {
 };
 
 export const generateInvoicePdf = async (invoice: Invoice, userPreference: InvoicePdfProps['userPreference']) => {
-    const blob = await pdf(<InvoicePdfDocument invoice={invoice} userPreference={userPreference} />).toBlob();
+    // Pre-fetch images using the browser's fetch (with session cookies) and
+    // convert to base64 data URLs so react-pdf can embed them directly.
+    const [resolvedLogoDataUrl, resolvedAvatarDataUrl] = await Promise.all([
+        userPreference?.company_logo_url
+            ? fetchImageAsDataUrl(userPreference.company_logo_url)
+            : Promise.resolve(null),
+        invoice.customer?.avatar_url
+            ? fetchImageAsDataUrl(invoice.customer.avatar_url)
+            : Promise.resolve(null),
+    ]);
+
+    const blob = await pdf(
+        <InvoicePdfDocument
+            invoice={invoice}
+            userPreference={userPreference}
+            resolvedLogoDataUrl={resolvedLogoDataUrl}
+            resolvedAvatarDataUrl={resolvedAvatarDataUrl}
+        />,
+    ).toBlob();
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
