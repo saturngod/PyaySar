@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { FileText, Users, ArrowRight } from 'lucide-react';
+import { FileText, Users, ArrowRight, TrendingUp, CheckCircle2 } from 'lucide-react';
 import {
     Table,
     TableBody,
@@ -13,6 +13,8 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -32,48 +34,126 @@ interface DraftInvoice {
     };
 }
 
+interface PeriodSummary {
+    total_amount: number;
+    received_amount: number;
+    invoice_count: number;
+    received_count: number;
+}
+
+interface ReportSummary {
+    daily: PeriodSummary;
+    monthly: PeriodSummary;
+    yearly: PeriodSummary;
+}
+
 interface DashboardProps {
     totalCustomers: number;
     totalInvoices: number;
     draftInvoices: DraftInvoice[];
+    reportSummary: ReportSummary;
 }
 
-export default function Dashboard({ totalCustomers, totalInvoices, draftInvoices }: DashboardProps) {
+function formatAmount(amount: number): string {
+    return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(amount);
+}
+
+type Period = 'daily' | 'monthly' | 'yearly';
+
+const PERIOD_LABELS: Record<Period, string> = {
+    daily: 'Today',
+    monthly: 'This Month',
+    yearly: 'This Year',
+};
+
+export default function Dashboard({ totalCustomers, totalInvoices, draftInvoices, reportSummary }: DashboardProps) {
+    const [period, setPeriod] = useState<Period>('monthly');
+    const summary = reportSummary[period];
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
+
+                {/* ── Period selector ── */}
+                <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold">Overview</h2>
+                    <Tabs value={period} onValueChange={(v: string) => setPeriod(v as Period)}>
+                        <TabsList>
+                            <TabsTrigger value="daily">Today</TabsTrigger>
+                            <TabsTrigger value="monthly">This Month</TabsTrigger>
+                            <TabsTrigger value="yearly">This Year</TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+                </div>
+
+                {/* ── Report cards ── */}
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {/* Total Invoiced */}
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Total Invoices
-                            </CardTitle>
-                            <FileText className="h-4 w-4 text-muted-foreground" />
+                            <CardTitle className="text-sm font-medium">Total Invoiced</CardTitle>
+                            <TrendingUp className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{totalInvoices}</div>
-                            <p className="text-xs text-muted-foreground">
-                                All time invoices
+                            <div className="text-2xl font-bold">{formatAmount(summary.total_amount)}</div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                                {summary.invoice_count} invoice{summary.invoice_count !== 1 ? 's' : ''} · {PERIOD_LABELS[period]}
                             </p>
                         </CardContent>
                     </Card>
+
+                    {/* Received (Paid) */}
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Total Customers
-                            </CardTitle>
+                            <CardTitle className="text-sm font-medium">Received</CardTitle>
+                            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold text-trading-up">
+                                {formatAmount(summary.received_amount)}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                                {summary.received_count} invoice{summary.received_count !== 1 ? 's' : ''} · {PERIOD_LABELS[period]}
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    {/* Outstanding */}
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Outstanding</CardTitle>
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">
+                                {formatAmount(summary.total_amount - summary.received_amount)}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                                {summary.invoice_count - summary.received_count} invoice{(summary.invoice_count - summary.received_count) !== 1 ? 's' : ''} · {PERIOD_LABELS[period]}
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    {/* Total Invoices count */}
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
                             <Users className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{totalCustomers}</div>
-                            <p className="text-xs text-muted-foreground">
-                                Active customers
+                            <p className="text-xs text-muted-foreground mt-1">
+                                {totalInvoices} total invoices
                             </p>
                         </CardContent>
                     </Card>
                 </div>
 
+                {/* ── Recent Draft Invoices ── */}
                 <div className="grid gap-4 md:grid-cols-1">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">

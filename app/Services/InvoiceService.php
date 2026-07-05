@@ -6,10 +6,15 @@ use App\Models\Invoice;
 use App\Models\InvoiceStatusHistory;
 use App\Models\Item;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class InvoiceService
 {
+    public function __construct(
+        private readonly InvoiceReportService $reportService,
+    ) {}
+
     /**
      * @param  array<string, mixed>  $filters
      * @return array<int, Invoice>
@@ -43,7 +48,7 @@ class InvoiceService
         $subTotal = collect($data['items'])->sum(fn ($item) => $item['qty'] * $item['price']);
         $total = $subTotal;
 
-        return DB::transaction(function () use ($user, $data, $subTotal, $total) {
+        $invoice = DB::transaction(function () use ($user, $data, $subTotal, $total) {
             $invoice = $user->invoices()->create([
                 'invoice_number' => $data['invoice_number'],
                 'customer_id' => $data['customer_id'],
@@ -67,8 +72,12 @@ class InvoiceService
                 ]);
             }
 
+            $this->reportService->recomputeForDate($user, Carbon::parse($data['open_date']));
+
             return $invoice;
         });
+
+        return $invoice;
     }
 
     /**
@@ -79,7 +88,9 @@ class InvoiceService
         $subTotal = collect($data['items'])->sum(fn ($item) => $item['qty'] * $item['price']);
         $total = $subTotal;
 
-        DB::transaction(function () use ($invoice, $data, $subTotal, $total) {
+        $oldOpenDate = $invoice->open_date->toDateString();
+
+        DB::transaction(function () use ($invoice, $data, $subTotal, $total, $oldOpenDate, $user) {
             $oldStatus = $invoice->status;
             $newStatus = $data['status'];
 
@@ -116,6 +127,13 @@ class InvoiceService
                     'total_price' => $item['qty'] * $item['price'],
                 ]);
             }
+
+            // Recompute report(s) inside the same transaction.
+            $newOpenDate = $data['open_date'];
+            if ($oldOpenDate !== $newOpenDate) {
+                $this->reportService->recomputeForDate($user, Carbon::parse($oldOpenDate));
+            }
+            $this->reportService->recomputeForDate($user, Carbon::parse($newOpenDate));
         });
 
         return $invoice->fresh(['items', 'customer']);
@@ -135,6 +153,8 @@ class InvoiceService
                     'to_status' => $status,
                     'changed_at' => now(),
                 ]);
+
+                $this->reportService->recomputeForDate($invoice->user, Carbon::parse($invoice->open_date));
             });
         }
 
@@ -145,10 +165,11 @@ class InvoiceService
     {
         $invoice->load('items');
 
-        return DB::transaction(function () use ($invoice) {
+        $newInvoice = DB::transaction(function () use ($invoice) {
             $nextId = (Invoice::max('id') ?? 0) + 1;
+            $user = $invoice->user()->first();
 
-            $newInvoice = $invoice->user()->first()->invoices()->create([
+            $newInvoice = $user->invoices()->create([
                 'invoice_number' => 'INV-'.$nextId,
                 'customer_id' => $invoice->customer_id,
                 'open_date' => now(),
@@ -171,13 +192,23 @@ class InvoiceService
                 ]);
             }
 
+            $this->reportService->recomputeForDate($user, Carbon::now());
+
             return $newInvoice;
         });
+
+        return $newInvoice;
     }
 
     public function delete(Invoice $invoice): void
     {
-        $invoice->delete();
+        $user = $invoice->user;
+        $openDate = Carbon::parse($invoice->open_date);
+
+        DB::transaction(function () use ($invoice, $user, $openDate) {
+            $invoice->delete();
+            $this->reportService->recomputeForDate($user, $openDate);
+        });
     }
 
     /**

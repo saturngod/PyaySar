@@ -6,13 +6,11 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useForm } from '@inertiajs/react';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface Customer {
@@ -90,13 +88,6 @@ export function CustomerFormDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            {!isEditing && (
-                <DialogTrigger asChild>
-                    <Button>
-                        <Plus className="mr-2 h-4 w-4" /> Add Customer
-                    </Button>
-                </DialogTrigger>
-            )}
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>

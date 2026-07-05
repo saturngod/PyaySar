@@ -4,7 +4,7 @@ FROM php:8.4-cli
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libjpeg-dev libfreetype6-dev \
     libonig-dev libxml2-dev libzip-dev libicu-dev \
-    supervisor cron \
+    supervisor \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
@@ -12,8 +12,9 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
     pdo_mysql mbstring exif pcntl bcmath gd zip intl opcache
 
-# Install Swoole (required for Octane)
-RUN pecl install swoole && docker-php-ext-enable swoole
+# Install Swoole + Redis
+RUN pecl install swoole redis \
+    && docker-php-ext-enable swoole redis
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -36,8 +37,12 @@ RUN npm ci
 # Copy the rest of the application
 COPY . .
 
-# Generate autoloader and build frontend
+# Copy supervisor configuration
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Generate autoloader, discover packages, and build frontend
 RUN composer dump-autoload --optimize \
+    && php artisan package:discover --ansi \
     && npm run build \
     && rm -rf node_modules
 
@@ -49,5 +54,5 @@ RUN chown -R www-data:www-data /var/www/html \
 
 EXPOSE 8000
 
-# Start Octane (Swoole) on 0.0.0.0 so Dokploy can route to it
-CMD ["php", "artisan", "octane:start", "--host=0.0.0.0", "--port=8000"]
+# Start supervisor (manages Octane + queue worker)
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

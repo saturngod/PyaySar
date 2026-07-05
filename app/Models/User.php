@@ -71,4 +71,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserPreference::class);
     }
+
+    public function invoiceReports(): HasMany
+    {
+        return $this->hasMany(InvoiceReport::class);
+    }
 }
