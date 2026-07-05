@@ -4,6 +4,7 @@ FROM php:8.4-cli
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libjpeg-dev libfreetype6-dev \
     libonig-dev libxml2-dev libzip-dev libicu-dev \
+    libssl-dev libcurl4-openssl-dev libbrotli-dev \
     supervisor \
     && rm -rf /var/lib/apt/lists/*
 
@@ -12,9 +13,13 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
     pdo_mysql mbstring exif pcntl bcmath gd zip intl opcache
 
-# Install Swoole + Redis
-RUN pecl install swoole redis \
-    && docker-php-ext-enable swoole redis
+# Install Swoole (required for Octane)
+RUN pecl install swoole \
+    && docker-php-ext-enable swoole
+
+# Install Redis extension
+RUN pecl install redis \
+    && docker-php-ext-enable redis
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
