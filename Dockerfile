@@ -43,8 +43,10 @@ RUN npm ci
 # Copy the rest of the application
 COPY . .
 
-# Copy supervisor configuration
+# Copy supervisor configuration and entrypoint script
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Generate autoloader, discover packages, and build frontend
 RUN composer dump-autoload --optimize \
@@ -60,5 +62,5 @@ RUN chown -R www-data:www-data /var/www/html \
 
 EXPOSE 8000
 
-# Start supervisor (manages Octane + queue worker)
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Run migrations, cache config, then start supervisor
+ENTRYPOINT ["entrypoint.sh"]
