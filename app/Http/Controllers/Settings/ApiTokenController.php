@@ -21,6 +21,7 @@ class ApiTokenController extends Controller
 
         return Inertia::render('settings/api-tokens', [
             'tokens' => $tokens,
+            'new_token' => fn () => $request->session()->get('new_token'),
         ]);
     }
 

@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { Copy, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -20,11 +20,9 @@ interface Props {
 }
 
 export default function ApiTokens({ tokens, new_token }: Props) {
-    const { flash } = usePage().props as { flash?: { new_token?: string } };
     const [tokenName, setTokenName] = useState('');
     const [creating, setCreating] = useState(false);
     const [copied, setCopied] = useState(false);
-    const shownToken = new_token || flash?.new_token;
 
     const handleCreate = (e: React.FormEvent) => {
         e.preventDefault();
@@ -44,8 +42,8 @@ export default function ApiTokens({ tokens, new_token }: Props) {
     };
 
     const handleCopy = () => {
-        if (shownToken) {
-            navigator.clipboard.writeText(shownToken);
+        if (new_token) {
+            navigator.clipboard.writeText(new_token);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         }
@@ -64,14 +62,14 @@ export default function ApiTokens({ tokens, new_token }: Props) {
                     </div>
 
                     {/* New token alert */}
-                    {shownToken && (
+                    {new_token && (
                         <div className="rounded-lg border border-green-500/30 bg-green-500/10 p-4 space-y-2">
                             <p className="text-sm font-medium text-green-700 dark:text-green-400">
                                 Token created! Copy it now — you won't see it again.
                             </p>
                             <div className="flex items-center gap-2">
                                 <code className="flex-1 rounded bg-muted px-3 py-2 text-xs break-all font-mono">
-                                    {shownToken}
+                                    {new_token}
                                 </code>
                                 <Button size="sm" variant="outline" onClick={handleCopy}>
                                     {copied ? 'Copied!' : <Copy className="h-4 w-4" />}
