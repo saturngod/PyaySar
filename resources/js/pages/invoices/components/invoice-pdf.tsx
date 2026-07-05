@@ -13,6 +13,20 @@ Font.register({
     ],
 });
 
+const getAbsoluteUrl = (url?: string | null): string => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    return `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
+const formatAmount = (amount: number | string): string => {
+    const num = Number(amount);
+    if (isNaN(num)) return '0.00';
+    return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(num);
+};
 
 const styles = StyleSheet.create({
     page: {
@@ -217,7 +231,7 @@ const InvoicePdfDocument = ({ invoice, userPreference }: InvoicePdfProps) => {
                         {userPreference?.company_logo_url && (
                             <Image
                                 style={styles.logo}
-                                src={userPreference.company_logo_url}
+                                src={getAbsoluteUrl(userPreference.company_logo_url)}
                             />
                         )}
                         <Text style={styles.partyName}>{userPreference?.company_name || ''}</Text>
@@ -226,6 +240,12 @@ const InvoicePdfDocument = ({ invoice, userPreference }: InvoicePdfProps) => {
                     </View>
                     <View style={styles.partySection}>
                         <Text style={styles.label}>To</Text>
+                        {customer?.avatar_url && (
+                            <Image
+                                style={styles.logo}
+                                src={getAbsoluteUrl(customer.avatar_url)}
+                            />
+                        )}
                         <Text style={styles.partyName}>{customer?.name || ''}</Text>
                         <Text style={styles.partyEmail}>{customer?.email || ''}</Text>
                         <Text style={styles.partyAddress}>{customer?.address || ''}</Text>
@@ -250,9 +270,9 @@ const InvoicePdfDocument = ({ invoice, userPreference }: InvoicePdfProps) => {
                             )}
                         </View>
                         <Text style={styles.colQty}>{item.qty}</Text>
-                        <Text style={styles.colPrice}>{Number(item.price).toFixed(2)}</Text>
+                        <Text style={styles.colPrice}>{formatAmount(item.price)}</Text>
                         <Text style={styles.colAmount}>
-                            {(Number(item.qty) * Number(item.price)).toFixed(2)}
+                            {formatAmount(Number(item.qty) * Number(item.price))}
                         </Text>
                     </View>
                 ))}
@@ -277,13 +297,13 @@ const InvoicePdfDocument = ({ invoice, userPreference }: InvoicePdfProps) => {
                         <View style={styles.totalRow}>
                             <Text style={styles.totalLabel}>Subtotal</Text>
                             <Text style={styles.totalValue}>
-                                {invoice.currency} {subTotal.toFixed(2)}
+                                {invoice.currency} {formatAmount(subTotal)}
                             </Text>
                         </View>
                         <View style={styles.grandTotal}>
                             <Text style={styles.grandTotalLabel}>Total Amount</Text>
                             <Text style={styles.grandTotalValue}>
-                                {invoice.currency} {total.toFixed(2)}
+                                {invoice.currency} {formatAmount(total)}
                             </Text>
                         </View>
                     </View>

@@ -30,6 +30,15 @@ import { CalendarIcon, Check, Plus, Trash2, X } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
+const formatAmount = (amount: number | string): string => {
+    const num = Number(amount);
+    if (isNaN(num)) return '0.00';
+    return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(num);
+};
+
 export interface Customer {
     id: number;
     name: string;
@@ -160,7 +169,7 @@ function AutocompleteItemName({ value, onChange, onSelectItem, className, placeh
                                         <span>{item.name}</span>
                                         {typeof item.price === 'number' && (
                                             <span className="ml-auto text-xs text-muted-foreground">
-                                                {item.price.toFixed(2)}
+                                                {formatAmount(item.price)}
                                             </span>
                                         )}
                                     </CommandItem>
@@ -623,7 +632,7 @@ export default function InvoiceForm({
                         </div>
                         <div className="col-span-2 text-right">
                             {readonly ? (
-                                <div className="flex h-9 items-center justify-end">{Number(item.price).toFixed(2)}</div>
+                                <div className="flex h-9 items-center justify-end">{formatAmount(item.price)}</div>
                             ) : (
                                 <Input
                                     type="number"
@@ -636,7 +645,7 @@ export default function InvoiceForm({
                             )}
                         </div>
                         <div className="col-span-2 flex h-9 items-center justify-end gap-2 text-right font-medium">
-                            {(item.qty * item.price).toFixed(2)}
+                            {formatAmount(item.qty * item.price)}
                             {!readonly && (
                                 <Button
                                     type="button"
@@ -713,13 +722,13 @@ export default function InvoiceForm({
                     <div className="flex justify-between text-sm">
                         <span className="font-medium text-muted-foreground">Subtotal</span>
                         <span className="font-medium text-foreground">
-                            {data.currency} {subTotal.toFixed(2)}
+                            {data.currency} {formatAmount(subTotal)}
                         </span>
                     </div>
                     <div className="border-t border-dashed border-border pt-4 flex justify-between items-center">
                         <span className="font-semibold text-foreground">Total Amount</span>
                         <span className="font-bold text-foreground">
-                            {data.currency} {total.toFixed(2)}
+                            {data.currency} {formatAmount(total)}
                         </span>
                     </div>
 
