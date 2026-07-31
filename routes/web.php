@@ -20,6 +20,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('customers', CustomerController::class);
     Route::resource('items', ItemController::class);
     Route::get('/invoices/search-items', [InvoiceController::class, 'searchItems'])->name('invoices.search-items');
+    Route::get('/invoices/{invoice}/json', [InvoiceController::class, 'showJson'])->name('invoices.json');
     Route::post('/invoices/{invoice}/duplicate', [InvoiceController::class, 'duplicate'])->name('invoices.duplicate');
     Route::resource('invoices', InvoiceController::class);
     Route::put('/invoices/{invoice}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.status');

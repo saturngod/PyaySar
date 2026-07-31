@@ -89,6 +89,7 @@ class InvoiceService
         $total = $subTotal;
 
         $oldOpenDate = $invoice->open_date->toDateString();
+        $user = $invoice->user;
 
         DB::transaction(function () use ($invoice, $data, $subTotal, $total, $oldOpenDate, $user) {
             $oldStatus = $invoice->status;

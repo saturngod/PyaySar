@@ -11,6 +11,7 @@ use App\Mcp\Tools\CreateItemTool;
 use App\Mcp\Tools\DeleteItemTool;
 use App\Mcp\Tools\ListInvoicesTool;
 use App\Mcp\Tools\ListItemsTool;
+use App\Mcp\Tools\UpdateInvoiceTool;
 use App\Models\Customer;
 use App\Models\Item;
 use App\Models\User;
@@ -74,6 +75,54 @@ describe('tools', function () {
             ->assertSee('Sent');
 
         expect($invoice->fresh()->statusHistories)->toHaveCount(1);
+    });
+
+    test('an invoice can be updated and its reports recomputed', function () {
+        $customer = Customer::factory()->create(['user_id' => $this->user->id]);
+        $invoice = $this->user->invoices()->create([
+            'invoice_number' => 'INV-UPDATE-1',
+            'customer_id' => $customer->id,
+            'open_date' => '2026-01-01',
+            'status' => 'Draft',
+            'currency' => 'USD',
+            'sub_total' => 100,
+            'total' => 100,
+        ]);
+        $invoice->items()->create([
+            'item_name' => 'Original service',
+            'qty' => 1,
+            'price' => 100,
+            'total_price' => 100,
+        ]);
+
+        PyaysarServer::actingAs($this->user)
+            ->tool(UpdateInvoiceTool::class, [
+                'invoice_id' => $invoice->id,
+                'invoice_number' => 'INV-UPDATE-1',
+                'customer_id' => $customer->id,
+                'open_date' => '2026-01-02',
+                'status' => 'Sent',
+                'currency' => 'USD',
+                'items' => [
+                    ['item_name' => 'Updated service', 'qty' => 2, 'price' => 30],
+                ],
+            ])
+            ->assertOk()
+            ->assertSee('60.00');
+
+        $updatedInvoice = $invoice->fresh();
+
+        expect($updatedInvoice->total)->toBe('60.00')
+            ->and($updatedInvoice->items)->toHaveCount(1)
+            ->and($updatedInvoice->items->first()->item_name)->toBe('Updated service')
+            ->and($updatedInvoice->statusHistories)->toHaveCount(1);
+
+        $this->assertDatabaseHas('invoice_reports', [
+            'user_id' => $this->user->id,
+            'report_date' => '2026-01-02',
+            'invoice_count' => 1,
+            'total_amount' => '60.00',
+        ]);
     });
 
     test('invoices can be listed and filtered by status', function () {

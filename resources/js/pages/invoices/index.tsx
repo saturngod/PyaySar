@@ -18,8 +18,10 @@ import {
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, router } from '@inertiajs/react';
-import { MoreHorizontal, History } from 'lucide-react';
+import { Download, History, MoreHorizontal } from 'lucide-react';
+import axios from 'axios';
 import { InvoiceFilters } from './components/invoice-filters';
+import { generateInvoicePdf } from './components/invoice-pdf';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -79,6 +81,20 @@ export default function Index({ invoices, filters, customers }: IndexProps) {
     const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(null);
     const [invoiceToDelete, setInvoiceToDelete] = useState<Invoice | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [downloadingId, setDownloadingId] = useState<number | null>(null);
+
+    const handleDownloadPdf = async (invoiceId: number) => {
+        if (downloadingId) return;
+        setDownloadingId(invoiceId);
+        try {
+            const { data } = await axios.get(`/invoices/${invoiceId}/json`);
+            await generateInvoicePdf(data.invoice, data.userPreference);
+        } catch (error) {
+            console.error('Failed to generate PDF', error);
+        } finally {
+            setDownloadingId(null);
+        }
+    };
 
     const handleDelete = () => {
         if (invoiceToDelete) {
@@ -190,6 +206,14 @@ export default function Index({ invoices, filters, customers }: IndexProps) {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                    <DropdownMenuItem
+                                                        className="cursor-pointer"
+                                                        disabled={downloadingId === invoice.id}
+                                                        onSelect={() => handleDownloadPdf(invoice.id)}
+                                                    >
+                                                        <Download className="mr-2 h-4 w-4" />
+                                                        {downloadingId === invoice.id ? 'Downloading…' : 'Download PDF'}
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuItem onClick={() => openHistory(invoice.id)}>
                                                         <History className="mr-2 h-4 w-4" />
                                                         History

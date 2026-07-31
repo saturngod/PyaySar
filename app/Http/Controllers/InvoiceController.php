@@ -100,6 +100,27 @@ class InvoiceController extends Controller
         ]);
     }
 
+    /**
+     * Return the full invoice (with items + customer) and the user's
+     * preference as JSON. Used by the invoice list page to generate a PDF
+     * without navigating to the detail page. Eager-loading customer and
+     * preference makes the avatar_url / company_logo_url accessors fire so
+     * the client-side PDF can fetch signed image URLs.
+     */
+    public function showJson(Invoice $invoice)
+    {
+        if ($invoice->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $invoice->load(['items', 'customer']);
+
+        return response()->json([
+            'invoice' => $invoice,
+            'userPreference' => Auth::user()->preference,
+        ]);
+    }
+
     public function update(StoreInvoiceRequest $request, Invoice $invoice)
     {
         if ($invoice->user_id !== Auth::id()) {
