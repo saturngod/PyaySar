@@ -2,18 +2,23 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 
 class UserPreference extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'company_name',
         'company_email',
         'company_address',
         'company_logo',
+        'default_note',
+        'default_bank_account_info',
     ];
 
     protected $appends = ['company_logo_url'];

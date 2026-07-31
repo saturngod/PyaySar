@@ -37,6 +37,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Invoice',
+        href: '/settings/invoice',
+        icon: null,
+    },
+    {
         title: 'API Tokens',
         href: '/settings/api-tokens',
         icon: null,

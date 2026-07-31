@@ -77,6 +77,8 @@ export interface UserPreference {
     company_address?: string;
     company_logo?: string;
     company_logo_url?: string;
+    default_note?: string | null;
+    default_bank_account_info?: string | null;
 }
 
 interface InvoiceFormProps {
@@ -216,8 +218,8 @@ export default function InvoiceForm({
         open_date: invoice?.open_date ? new Date(invoice.open_date) : new Date(),
         due_date: invoice?.due_date ? new Date(invoice.due_date) : undefined,
         items: initialItems as InvoiceItem[],
-        notes: invoice?.notes || '',
-        bank_account_info: invoice?.bank_account_info || '',
+        notes: invoice?.notes || (!isEditing ? userPreference?.default_note ?? '' : ''),
+        bank_account_info: invoice?.bank_account_info || (!isEditing ? userPreference?.default_bank_account_info ?? '' : ''),
     });
 
     const [customerOpen, setCustomerOpen] = useState(false);
