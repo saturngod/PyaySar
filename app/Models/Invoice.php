@@ -27,8 +27,8 @@ class Invoice extends Model
     ];
 
     protected $casts = [
-        'open_date' => 'date',
-        'due_date' => 'date',
+        'open_date' => 'date:Y-m-d',
+        'due_date' => 'date:Y-m-d',
         'sub_total' => 'decimal:2',
         'discount' => 'decimal:2',
         'total' => 'decimal:2',

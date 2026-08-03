@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
+import { parseDateOnly } from '@/lib/date-only';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
@@ -190,7 +191,7 @@ export default function Dashboard({ totalCustomers, totalInvoices, draftInvoices
                                                     </Link>
                                                 </TableCell>
                                                 <TableCell>{invoice.customer?.name || 'N/A'}</TableCell>
-                                                <TableCell>{new Date(invoice.open_date).toLocaleDateString()}</TableCell>
+                                                <TableCell>{parseDateOnly(invoice.open_date).toLocaleDateString()}</TableCell>
                                                 <TableCell className="text-right">
                                                     {invoice.currency} {Number(invoice.total).toFixed(2)}
                                                 </TableCell>

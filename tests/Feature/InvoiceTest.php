@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\UserPreference;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Testing\AssertableInertia as Assert;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
@@ -64,6 +65,25 @@ describe('invoices.json', function () {
                 'userPreference' => ['company_name'],
             ])
             ->assertJsonCount(1, 'invoice.items');
+    });
+
+    test('serializes date-only fields without a timezone offset', function () {
+        $invoice = makeInvoiceForInvoiceTests($this->user, [
+            'open_date' => '2026-07-02',
+            'due_date' => '2026-07-09',
+        ]);
+
+        get(route('invoices.edit', $invoice))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('invoices/edit')
+                ->where('invoice.open_date', '2026-07-02')
+                ->where('invoice.due_date', '2026-07-09'));
+
+        get(route('invoices.json', $invoice))
+            ->assertOk()
+            ->assertJsonPath('invoice.open_date', '2026-07-02')
+            ->assertJsonPath('invoice.due_date', '2026-07-09');
     });
 
     test('is forbidden for another user invoice (ownership enforced)', function () {

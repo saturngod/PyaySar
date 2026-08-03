@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { parseDateOnly } from '@/lib/date-only';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -56,7 +57,7 @@ export const getColumns = ({ onEdit, onDelete }: ColumnsProps) => [
         accessorKey: 'open_date',
         header: 'Date',
         cell: ({ row }: { row: { original: Invoice } }) => (
-             <span>{new Date(row.original.open_date).toLocaleDateString()}</span>
+             <span>{parseDateOnly(row.original.open_date).toLocaleDateString()}</span>
         ),
     },
     {

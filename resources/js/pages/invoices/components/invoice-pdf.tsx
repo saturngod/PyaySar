@@ -1,4 +1,5 @@
 import { Document, Font, Image, Page, pdf, StyleSheet, Text, View } from '@react-pdf/renderer';
+import { parseDateOnly } from '@/lib/date-only';
 import { pdfImage } from '@/routes/invoices';
 import { format } from 'date-fns';
 import { Invoice } from './invoice-form';
@@ -251,14 +252,14 @@ const InvoicePdfDocument = ({ invoice, userPreference, resolvedLogoDataUrl, reso
                         <View style={styles.dateItem}>
                             <Text style={styles.label}>Issued</Text>
                             <Text style={styles.dateValue}>
-                                {invoice.open_date ? format(new Date(invoice.open_date), 'PPP') : '-'}
+                                {invoice.open_date ? format(parseDateOnly(invoice.open_date), 'PPP') : '-'}
                             </Text>
                         </View>
                         {invoice.due_date && (
                             <View style={styles.dateItem}>
                                 <Text style={styles.label}>Due</Text>
                                 <Text style={styles.dateValue}>
-                                    {format(new Date(invoice.due_date), 'PPP')}
+                                    {format(parseDateOnly(invoice.due_date), 'PPP')}
                                 </Text>
                             </View>
                         )}

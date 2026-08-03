@@ -23,6 +23,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { parseDateOnly } from '@/lib/date-only';
 import { cn } from '@/lib/utils';
 import { useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
@@ -215,8 +216,8 @@ export default function InvoiceForm({
         customer_id: invoice?.customer_id?.toString() || '',
         status: invoice?.status || 'Draft',
         currency: invoice?.currency || 'MMK',
-        open_date: invoice?.open_date ? new Date(invoice.open_date) : new Date(),
-        due_date: invoice?.due_date ? new Date(invoice.due_date) : undefined,
+        open_date: invoice?.open_date ? parseDateOnly(invoice.open_date) : new Date(),
+        due_date: invoice?.due_date ? parseDateOnly(invoice.due_date) : undefined,
         items: initialItems as InvoiceItem[],
         notes: invoice?.notes || (!isEditing ? userPreference?.default_note ?? '' : ''),
         bank_account_info: invoice?.bank_account_info || (!isEditing ? userPreference?.default_bank_account_info ?? '' : ''),

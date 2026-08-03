@@ -17,6 +17,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { parseDateOnly } from '@/lib/date-only';
 import { Head, Link, router } from '@inertiajs/react';
 import { Download, History, MoreHorizontal } from 'lucide-react';
 import axios from 'axios';
@@ -172,7 +173,7 @@ export default function Index({ invoices, filters, customers }: IndexProps) {
                                             {invoice.customer?.name || 'N/A'}
                                         </TableCell>
                                         <TableCell>
-                                            {new Date(invoice.open_date).toLocaleDateString()}
+                                            {parseDateOnly(invoice.open_date).toLocaleDateString()}
                                         </TableCell>
                                         <TableCell onClick={(e) => e.stopPropagation()}>
                                             <Select

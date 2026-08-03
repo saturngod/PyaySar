@@ -20,6 +20,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { parseDateOnly } from '@/lib/date-only';
 import { cn } from '@/lib/utils';
 import { router } from '@inertiajs/react';
 import { format } from 'date-fns';
@@ -40,10 +41,10 @@ export function InvoiceFilters({ filters, customers }: FilterProps) {
     const [status, setStatus] = useState(filters.status || 'all');
     const [customerId, setCustomerId] = useState(filters.customer_id || 'all');
     const [dateFrom, setDateFrom] = useState<Date | undefined>(
-        filters.date_from ? new Date(filters.date_from) : undefined,
+        filters.date_from ? parseDateOnly(filters.date_from) : undefined,
     );
     const [dateTo, setDateTo] = useState<Date | undefined>(
-        filters.date_to ? new Date(filters.date_to) : undefined,
+        filters.date_to ? parseDateOnly(filters.date_to) : undefined,
     );
     const [customerOpen, setCustomerOpen] = useState(false);
 
