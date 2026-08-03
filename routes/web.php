@@ -21,6 +21,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('items', ItemController::class);
     Route::get('/invoices/search-items', [InvoiceController::class, 'searchItems'])->name('invoices.search-items');
     Route::get('/invoices/{invoice}/json', [InvoiceController::class, 'showJson'])->name('invoices.json');
+    Route::get('/invoices/{invoice}/pdf-image/{image}', [InvoiceController::class, 'pdfImage'])
+        ->whereIn('image', ['avatar', 'logo'])
+        ->name('invoices.pdf-image');
     Route::post('/invoices/{invoice}/duplicate', [InvoiceController::class, 'duplicate'])->name('invoices.duplicate');
     Route::resource('invoices', InvoiceController::class);
     Route::put('/invoices/{invoice}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.status');

@@ -8,6 +8,7 @@ use App\Models\Invoice;
 use App\Services\InvoiceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class InvoiceController extends Controller
@@ -118,6 +119,31 @@ class InvoiceController extends Controller
         return response()->json([
             'invoice' => $invoice,
             'userPreference' => Auth::user()->preference,
+        ]);
+    }
+
+    /**
+     * Stream an invoice image through the app so browser-side PDF generation
+     * never needs cross-origin access to the underlying object store.
+     */
+    public function pdfImage(Invoice $invoice, string $image)
+    {
+        if ($invoice->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $invoice->loadMissing('customer');
+
+        $path = match ($image) {
+            'avatar' => $invoice->customer?->avatar,
+            'logo' => Auth::user()->preference?->company_logo,
+        };
+
+        abort_unless($path && Storage::exists($path), 404);
+
+        return Storage::response($path, null, [
+            'Cache-Control' => 'private, max-age=300',
+            'Content-Disposition' => 'inline',
         ]);
     }
 

@@ -1,4 +1,5 @@
 import { Document, Font, Image, Page, pdf, StyleSheet, Text, View } from '@react-pdf/renderer';
+import { pdfImage } from '@/routes/invoices';
 import { format } from 'date-fns';
 import { Invoice } from './invoice-form';
 
@@ -356,12 +357,17 @@ const InvoicePdfDocument = ({ invoice, userPreference, resolvedLogoDataUrl, reso
 export const generateInvoicePdf = async (invoice: Invoice, userPreference: InvoicePdfProps['userPreference']) => {
     // Pre-fetch images using the browser's fetch (with session cookies) and
     // convert to base64 data URLs so react-pdf can embed them directly.
+    // Stored images are streamed through Laravel to avoid requiring CORS on
+    // private S3/R2 buckets.
+    const imageEndpoint = (image: 'avatar' | 'logo') =>
+        pdfImage.url({ invoice: invoice.id, image });
+
     const [resolvedLogoDataUrl, resolvedAvatarDataUrl] = await Promise.all([
-        userPreference?.company_logo_url
-            ? fetchImageAsDataUrl(userPreference.company_logo_url)
+        userPreference?.company_logo
+            ? fetchImageAsDataUrl(imageEndpoint('logo'))
             : Promise.resolve(null),
-        invoice.customer?.avatar_url
-            ? fetchImageAsDataUrl(invoice.customer.avatar_url)
+        invoice.customer?.avatar
+            ? fetchImageAsDataUrl(imageEndpoint('avatar'))
             : Promise.resolve(null),
     ]);
 
