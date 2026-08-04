@@ -22,10 +22,12 @@ use App\Mcp\Tools\SearchInvoiceItemsTool;
 use App\Mcp\Tools\UpdateCustomerTool;
 use App\Mcp\Tools\UpdateInvoiceTool;
 use App\Mcp\Tools\UpdateItemTool;
+use Illuminate\Support\Carbon;
 use Laravel\Mcp\Server;
 use Laravel\Mcp\Server\Attributes\Instructions;
 use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Attributes\Version;
+use Laravel\Mcp\Server\ServerContext;
 
 #[Name('Pyaysar')]
 #[Version('1.0.0')]
@@ -60,4 +62,26 @@ class PyaysarServer extends Server
         OverdueInvoiceReminderPrompt::class,
         ReceivablesSummaryPrompt::class,
     ];
+
+    /**
+     * Inject the current date into the server instructions so the AI
+     * agent always knows the real "today" (its training cutoff may
+     * otherwise make it default to a stale year when only a day/month
+     * is supplied for invoice and due dates).
+     */
+    public function createContext(): ServerContext
+    {
+        $context = parent::createContext();
+
+        $today = Carbon::now();
+        $iso = $today->toDateString();
+        $human = $today->format('j F Y');
+
+        $context->instructions .= "\n\nToday's date is {$iso} ({$human}). ".
+            'When the user provides a date without an explicit year (e.g. "Aug 5", "5/8"), '.
+            "assume the current year ({$today->year}) unless context clearly indicates otherwise. ".
+            'Always send invoice open_date and due_date as full YYYY-MM-DD values.';
+
+        return $context;
+    }
 }

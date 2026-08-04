@@ -50,8 +50,8 @@ class CreateInvoiceTool extends Tool
         return [
             'invoice_number' => $schema->string()->description('Unique invoice number, e.g. INV-101.')->required(),
             'customer_id' => $schema->integer()->description('ID of the customer to bill.')->required(),
-            'open_date' => $schema->string()->description('Invoice open date (YYYY-MM-DD).')->required(),
-            'due_date' => $schema->string()->description('Optional due date (YYYY-MM-DD).'),
+            'open_date' => $schema->string()->description('Invoice open date as a full YYYY-MM-DD string. Today is '.now()->toDateString().' — use the current year when the user omits it.')->required(),
+            'due_date' => $schema->string()->description('Optional due date as a full YYYY-MM-DD string (must be on or after open_date). Use the current year when the user omits it.'),
             'status' => $schema->string()->enum(['Draft', 'Sent', 'Received', 'Reject'])->description('Initial status.')->required(),
             'currency' => $schema->string()->enum(['USD', 'MMK'])->description('Invoice currency.')->required(),
             'items' => $schema->array()

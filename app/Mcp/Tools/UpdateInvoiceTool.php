@@ -56,8 +56,8 @@ class UpdateInvoiceTool extends Tool
             'invoice_id' => $schema->integer()->description('ID of the invoice to update.')->required(),
             'invoice_number' => $schema->string()->required(),
             'customer_id' => $schema->integer()->required(),
-            'open_date' => $schema->string()->required(),
-            'due_date' => $schema->string(),
+            'open_date' => $schema->string()->description('Invoice open date as a full YYYY-MM-DD string. Today is '.now()->toDateString().' — use the current year when the user omits it.')->required(),
+            'due_date' => $schema->string()->description('Optional due date as a full YYYY-MM-DD string (must be on or after open_date). Use the current year when the user omits it.'),
             'status' => $schema->string()->enum(['Draft', 'Sent', 'Received', 'Reject'])->required(),
             'currency' => $schema->string()->enum(['USD', 'MMK'])->required(),
             'items' => $schema->array()
